@@ -1,5 +1,16 @@
 docker-compose -f docker-compose.dev.yml up
 
+Что-то нахерачил с типами, приберись на свежую голову. Возможно IUser вообще лишний
+
+Для тестов в постмане:
+{
+  "email": "asdad",
+  "passwordHash": "asdad",
+  "name": "asdad",
+  "contactPhone": "asdad",
+  "role": "asdad"
+}
+
 Контроллер пользователей временно нужен для теста сервисов пользователей, не забудь удалить.
 
 Почитай по Partial в TS

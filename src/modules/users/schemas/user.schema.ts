@@ -20,7 +20,7 @@ export class User {
   contactPhone: string;
 
   @Prop({ required: true, unique: false, default: Roles.CLIENT })
-  role: string;
+  role: Roles;
 }
 
 export type UserDocument = User & Document;
