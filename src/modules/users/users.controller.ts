@@ -6,13 +6,15 @@ import {
   Put,
   Body,
   Param,
+  Query,
 } from '@nestjs/common';
 import { UsersService } from './users.service';
 import { User } from './schemas/user.schema';
-import { IUser } from './typing/interfaces/IUser';
-import { UserDto } from './typing/interfaces/UserDto';
+import { UserDto } from './typing/interfaces/user.dto';
+import { ID } from 'src/types/id';
+import { ISearchUserParams } from './typing/interfaces/ISearchUserParams';
 
-@Controller('users')
+@Controller('api/users')
 export class UsersController {
   constructor(private readonly usersService: UsersService) {}
 
@@ -21,31 +23,13 @@ export class UsersController {
     return this.usersService.create(body);
   }
 
-  /*
   @Get()
-  @HttpCode(HttpStatus.OK)
-  public getAllBooks(): Promise<Book[]> {
-    return this.booksService.findAll();
+  public findAll(@Query() queryParams: ISearchUserParams): Promise<User[]> {
+    return this.usersService.findAll(queryParams);
   }
 
   @Get(':id')
-  @HttpCode(HttpStatus.OK)
-  public getTargetBook(@Param('id') id: string): Promise<Book> {
-    // альтернативный способ извлечения id
-    return this.booksService.findOne(id);
+  public getTargetBook(@Param('id') id: ID): Promise<User> {
+    return this.usersService.findById(id);
   }
-
-  @Delete(':id')
-  public delete(@Param() { id }: IParamId): Promise<Book> {
-    return this.booksService.delete(id);
-  }
-
-  @Put(':id')
-  public update(
-    @Param() { id }: IParamId,
-    @Body() body: UpdateBookDto,
-  ): Promise<Book> {
-    return this.booksService.update(id, body);
-  }
-  */
 }
