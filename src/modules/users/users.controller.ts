@@ -7,29 +7,47 @@ import {
   Body,
   Param,
   Query,
+  UseFilters,
+  HttpException,
+  HttpStatus,
+  HttpCode,
 } from '@nestjs/common';
 import { UsersService } from './users.service';
 import { User } from './schemas/user.schema';
 import { UserDto } from './typing/interfaces/user.dto';
 import { ID } from 'src/types/id';
 import { ISearchUserParams } from './typing/interfaces/ISearchUserParams';
+import { FindUserExceptionFilter } from './find.user.exception.filter';
 
 @Controller('api/users')
 export class UsersController {
   constructor(private readonly usersService: UsersService) {}
 
   @Post()
-  public create(@Body() body: UserDto): Promise<User> {
-    return this.usersService.create(body);
+  @HttpCode(HttpStatus.CREATED)
+  async create(@Body() body: UserDto): Promise<User> {
+    return await this.usersService.create(body);
   }
 
   @Get()
-  public findAll(@Query() queryParams: ISearchUserParams): Promise<User[]> {
-    return this.usersService.findAll(queryParams);
+  @HttpCode(HttpStatus.OK)
+  async findAll(@Query() queryParams: ISearchUserParams): Promise<User[]> {
+    return await this.usersService.findAll(queryParams);
   }
 
+  // TODO: Так, а я не могу выкидывать эксепшн-то внутри сервиса? Фигово. Могу точнее, но тогда он мне это не как ответ возвращает, а пишет в консоль
   @Get(':id')
-  public getTargetBook(@Param('id') id: ID): Promise<User> {
-    return this.usersService.findById(id);
+  @HttpCode(HttpStatus.OK) // Ага, значит эта штука работает только при успешном сценарии... беру в оборот!
+  @UseFilters(FindUserExceptionFilter)
+  async findById(@Param('id') id: ID): Promise<User> {
+    const result = await this.usersService.findById(id);
+    if (result) {
+      return result;
+    } else {
+      throw new HttpException(
+        'Такой пользователь не найден!', // TODO: тоже можно в константы или енамки
+        HttpStatus.NOT_FOUND,
+      );
+    }
   }
 }

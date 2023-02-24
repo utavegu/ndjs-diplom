@@ -21,13 +21,9 @@ export class UsersService implements IUserService {
   }
 
   async findById(id: ID): Promise<User> {
+    // TODO: Вот это у меня по-моему шляпа с разделением перехвата ошибок на контроллер и сервис, но лучше пока не придумал. Кэтч тут мало шансов имеет сработать, ибо ненайденный пользователь ошибкой не считается - просто налл.
     try {
-      // eslint-disable-next-line prettier/prettier
-      const user = await this.UserModel.findById(id).select('-__v -passwordHash');
-      if (user) {
-        return user;
-      }
-      // TODO: иначе выкинуть кастомное исключение, что такого пользователя нет
+      return await this.UserModel.findById(id).select('-__v -passwordHash');
     } catch (err) {
       console.error(err);
     }
@@ -35,17 +31,13 @@ export class UsersService implements IUserService {
 
   async findByEmail(email: string): Promise<User> {
     try {
-      // eslint-disable-next-line prettier/prettier
-      const user = await this.UserModel.findOne({ email }).select('-__v -passwordHash');
-      if (user) {
-        return user;
-      }
-      // TODO: иначе выкинуть кастомное исключение, что такого пользователя нет
+      return await this.UserModel.findOne({ email }).select('-__v -passwordHash');
     } catch (err) {
       console.error(err);
     }
   }
 
+  // TODO: тоже трай-кэтч!
   async findAll(params: ISearchUserParams): Promise<User[]> {
     const {
       limit = DEFAULT_USERS_LIMIT,
