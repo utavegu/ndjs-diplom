@@ -13,6 +13,8 @@ export class UsersService implements IUserService {
   constructor(@InjectModel(User.name) private UserModel: Model<UserDocument>) { }
 
   async create(data: Partial<User>): Promise<User> {
+    console.log(data);
+    // хэширование пароля password -> passwordHash. В таком виде модель юзера уже дату не схавает, так как там необходимо поле именно пассвордХэш
     try {
       return await new this.UserModel(data).save();
     } catch (err) {

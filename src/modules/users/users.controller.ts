@@ -1,36 +1,22 @@
 import {
   Controller,
   Get,
-  Post,
-  Delete,
-  Put,
-  Body,
   Param,
   Query,
   UseFilters,
   HttpException,
   HttpStatus,
   HttpCode,
-  UsePipes,
 } from '@nestjs/common';
 import { UsersService } from './users.service';
 import { User } from './schemas/user.schema';
-import { UserDto } from './typing/interfaces/user.dto';
 import { ID } from 'src/types/id';
 import { ISearchUserParams } from './typing/interfaces/ISearchUserParams';
 import { FindUserExceptionFilter } from './find.user.exception.filter';
-import { CreateUserValidationPipeInstance } from './validation/create.user.validation.pipe';
 
 @Controller('api/users')
 export class UsersController {
   constructor(private readonly usersService: UsersService) {}
-
-  @Post()
-  @HttpCode(HttpStatus.CREATED)
-  @UsePipes(CreateUserValidationPipeInstance)
-  async create(@Body() body: UserDto): Promise<User> {
-    return await this.usersService.create(body);
-  }
 
   @Get()
   @HttpCode(HttpStatus.OK)

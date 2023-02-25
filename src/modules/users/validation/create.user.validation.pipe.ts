@@ -21,5 +21,6 @@ export class CreateUserValidationPipe implements PipeTransform {
   }
 }
 
+// TODO: Вообще так-то код довольно общий тут, напрасно разбил на именно криейт-юзер. Только схема и меняется, так что верни в прокидывание схемы наружу, а класс и файл переименуй в ValidationPipe и куда-нибудь в корень его... helpers?
 // eslint-disable-next-line prettier/prettier
 export const CreateUserValidationPipeInstance = new CreateUserValidationPipe(createUserValidationSchema);
