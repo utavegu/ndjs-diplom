@@ -3,20 +3,24 @@ import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { DEFAULT_USERS_LIMIT, DEFAULT_USERS_OFFSET } from 'src/constants';
+import { encryptPassword } from 'src/helpers/encrypt-password';
 import { ID } from 'src/types/id';
 import { User, UserDocument } from './schemas/user.schema';
 import { ISearchUserParams } from './typing/interfaces/ISearchUserParams';
 import { IUserService } from './typing/interfaces/IUserService';
+import { UserDto } from './typing/interfaces/user.dto';
 
 @Injectable()
 export class UsersService implements IUserService {
   constructor(@InjectModel(User.name) private UserModel: Model<UserDocument>) { }
 
-  async create(data: Partial<User>): Promise<User> {
-    console.log(data);
-    // хэширование пароля password -> passwordHash. В таком виде модель юзера уже дату не схавает, так как там необходимо поле именно пассвордХэш
+  // ПРОМИС ЮЗЕР должен возвращать, НО! + _id и - passwordHash и role
+  async create(data: Omit<UserDto, 'role'>): Promise<User> {
     try {
-      return await new this.UserModel(data).save();
+      const { password, ...other } = data;
+      const passwordHash = await encryptPassword(password);
+      // TODO: Возвращаю слишком много полей. Надо придумать, как возвращать только имя, почту и айдишник, которого, внимание, нет в User! (читай по create и save, а также как расширить юзер прямо тут)
+      return await this.UserModel.create({ ...other, passwordHash, role: 'client' });
     } catch (err) {
       console.error(err);
     }
@@ -47,6 +51,7 @@ export class UsersService implements IUserService {
     } = params;
 
     // TODO: Сделать большую коллекцию юзеров через "монго шел -> инсерт мэни" и потестить разные кейсы
+    // TODO2: Тоже как-то типизировать надо, наверное?
     const selectionCriteria = {
       email: params.email && { $regex: params.email },
       name: params.name && { $regex: params.name },

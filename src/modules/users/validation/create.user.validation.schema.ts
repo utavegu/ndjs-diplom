@@ -29,5 +29,5 @@ export const createUserValidationSchema = Joi.object().keys({
   role: Joi
     // TODO: только одно из трёх значений
     .string()
-    .required(),
+    .optional(), // пока сделаю необязательным, так как скорее всего задаваться она будет в сервисе
 });
