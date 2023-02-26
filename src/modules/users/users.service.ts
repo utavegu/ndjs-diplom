@@ -18,16 +18,15 @@ export class UsersService implements IUserService {
   // ПРОМИС ЮЗЕР должен возвращать, НО! + _id и - passwordHash и role
   async create(data: Omit<UserDto, 'role'>): Promise<User> {
     try {
-      const user = this.findByEmail(data.email);
-      if (!user) {
-        const { password, ...other } = data;
-        const passwordHash = await encryptPassword(password);
-        // TODO: Возвращаю слишком много полей. Надо придумать, как возвращать только имя, почту и айдишник, которого, внимание, нет в User! (читай по create и save, а также как расширить юзер прямо тут)
-        return await this.UserModel.create({ ...other, passwordHash, role: Roles.CLIENT });
-      } else {
-        throw new BadRequestException(ERROR_MESSAGES.USER_IS_ALREADY_USER_IS_NOT_REGISTERED);
-      }
+      const { password, ...other } = data;
+      const passwordHash = await encryptPassword(password);
+      // TODO: Возвращаю слишком много полей. Надо придумать, как возвращать только имя, почту и айдишник, которого, внимание, нет в User! (читай по create и save, а также как расширить юзер прямо тут)
+      return await this.UserModel.create({ ...other, passwordHash, role: Roles.CLIENT });
     } catch (err) {
+      // TODO: выглядит не очень надежно, вероятно, есть способы лучше
+      if (err.code === 11000 && String(err.keyPattern) === String({ email: 1 })) {
+        throw new BadRequestException(ERROR_MESSAGES.USER_IS_ALREADY_REGISTERED);
+      }
       throw new HttpException(err.message, err.status);
     }
   }

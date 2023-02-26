@@ -30,6 +30,7 @@ export class AuthService {
     body: Omit<UserDto, 'name' | 'contactPhone' | 'role'>,
   ): Promise<User> {
     try {
+      // TODO: А что на счёт выставления куки?
       const user = await this.usersService.findByEmail(body.email);
       if (user) {
         const isValidPassword = await comparePasswords(
@@ -48,10 +49,19 @@ export class AuthService {
           throw new UnauthorizedException('Неверный пароль!');
         }
       } else {
-        throw new NotFoundException('Такой пользователь не зарегистрирован!');
+        throw new UnauthorizedException(
+          'Такой пользователь не зарегистрирован!',
+          // Почему опять в консоль пуляешь, а не в ответ?.. ты как-то через раз это делаешь...
+        );
       }
     } catch (err) {
       throw new HttpException(err.message, err.status);
     }
+  }
+
+  async logout(request: Request) {
+    // TODO: А что на счёт удаления куки?
+    // request.logout(); эээмм... ну тогда надо повникать будет
+    // Читай то, что у тебя в закладках JWT и 3 статьи документации неста. Сейчас самое время в эту тему поврубаться и сделать всё максимально красиво (увы, пока без клиента). Видео Улбика по продвинутой JWT-авторизации
   }
 }

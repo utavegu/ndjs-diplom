@@ -11,7 +11,7 @@ import { AuthService } from './auth.service';
     PassportModule,
     JwtModule.register({
       secret: 'asd79kmr', // TODO: в енв (и узнать откуда берется по нормальному)
-      signOptions: { expiresIn: '30s' }, // В ЕНВ
+      signOptions: { expiresIn: '120s' }, // В ЕНВ
     }),
     UsersModule,
   ],
