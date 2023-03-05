@@ -6,6 +6,10 @@ import {
   Get,
   Query,
   UseGuards,
+  Post,
+  UsePipes,
+  Body,
+  Request,
 } from '@nestjs/common';
 import { UsersService } from '../users/users.service';
 import { User } from '../users/schemas/user.schema';
@@ -15,13 +19,28 @@ import { ISearchUserParams } from '../users/typing/interfaces/ISearchUserParams'
 // import { Roles } from '../users/typing/enums/roles.enum';
 import { AdminRoleGuard } from './guards/admin.role.guard';
 import { ManagerRoleGuard } from './guards/manager.role.guard';
+import { createUserValidationSchema } from '../users/create.user.validation.schema';
+import { UserDto } from '../users/typing/interfaces/user.dto';
+import { ValidationPipe } from 'src/helpers/validation.pipe';
 
 @Controller()
 export class UsersManagementController {
   constructor(private readonly usersService: UsersService) {}
 
+  @Post('admin/users')
+  @UseGuards(AdminRoleGuard)
+  @HttpCode(HttpStatus.CREATED)
+  @UsePipes(new ValidationPipe(createUserValidationSchema))
+  @UseFilters(MyExceptionFilter)
+  async adminCreateUser(
+    @Body() body: UserDto,
+    @Request() request,
+  ): Promise<Partial<User>> {
+    return await this.usersService.create(body, request.user);
+  }
+
   @Get('admin/users')
-  // @Role(Roles.ADMIN)
+  // @Role(Roles.ADMIN) // TODO: если сможешь починить эту штуку, по-хорошему гарду повесить на весь контроллер
   @UseGuards(AdminRoleGuard)
   @HttpCode(HttpStatus.OK)
   @UseFilters(MyExceptionFilter)

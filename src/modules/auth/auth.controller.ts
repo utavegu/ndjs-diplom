@@ -25,16 +25,15 @@ import { createUserValidationSchema } from '../users/create.user.validation.sche
 export class AuthController {
   constructor(
     private readonly authService: AuthService,
-    private readonly userService: UsersService,
+    private readonly usersService: UsersService,
   ) {}
 
   @Post('client/register')
   @HttpCode(HttpStatus.CREATED)
   @UsePipes(new ValidationPipe(createUserValidationSchema))
   @UseFilters(MyExceptionFilter)
-  // TODO: Ещё должна быть проверка на то, что пользователь не аутентифицирован. Это, видимо, в сессию надо лазить. Разберись, можно ли это сделать "по-некстовому", или только через реквест
-  async create(@Body() body: Omit<UserDto, 'role'>): Promise<User> {
-    return await this.userService.create(body);
+  async create(@Body() body: Omit<UserDto, 'role'>): Promise<Partial<User>> {
+    return await this.usersService.create(body);
   }
 
   @Post('auth/login')
