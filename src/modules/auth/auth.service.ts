@@ -18,7 +18,7 @@ export class AuthService {
     private readonly jwtService: JwtService,
   ) {}
 
-  protected createToken(payload: {
+  createToken(payload: {
     email: User['email'];
     name: User['name'];
     role: User['role'];
@@ -38,12 +38,12 @@ export class AuthService {
           user.passwordHash,
         );
         if (isValidPassword) {
-          const token = this.createToken({
-            email: user.email,
-            name: user.name,
-            role: user.role,
-          });
-          console.log(token);
+          // Перенес в контроллер
+          // this.createToken({
+          //   email: user.email,
+          //   name: user.name,
+          //   role: user.role,
+          // });
           return user;
         } else {
           throw new UnauthorizedException('Неверный пароль!');
@@ -59,9 +59,13 @@ export class AuthService {
     }
   }
 
-  async logout(request: Request) {
+  /*
+  async logout(request, session) {
+    // console.log(request.isAuthenticated());
+    // console.log(session);
     // TODO: А что на счёт удаления куки?
     // request.logout(); эээмм... ну тогда надо повникать будет
     // Читай то, что у тебя в закладках JWT и 3 статьи документации неста. Сейчас самое время в эту тему поврубаться и сделать всё максимально красиво (увы, пока без клиента). Видео Улбика по продвинутой JWT-авторизации
   }
+  */
 }

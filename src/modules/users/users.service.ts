@@ -23,7 +23,9 @@ export class UsersService implements IUserService {
       // TODO: Возвращаю слишком много полей. Надо придумать, как возвращать только имя, почту и айдишник, которого, внимание, нет в User! (читай по create и save, а также как расширить юзер прямо тут)
       return await this.UserModel.create({ ...other, passwordHash, role: Roles.CLIENT });
     } catch (err) {
-      // TODO: выглядит не очень надежно, вероятно, есть способы лучше
+      // TODO: выглядит не очень надежно, вероятно, есть способы лучше. Как вариант, можно было дернуть юзера в базе, но тогда:
+      // 1) Лишний запрос в базу (на сколько это плохо?)
+      // 2) Нужно будет в методе поиска юзера по емэйлу возвращать налл, а не эксепшн (что в целом логично)
       if (err.code === 11000 && String(err.keyPattern) === String({ email: 1 })) {
         throw new BadRequestException(ERROR_MESSAGES.USER_IS_ALREADY_REGISTERED);
       }

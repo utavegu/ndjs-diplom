@@ -13,7 +13,7 @@ import { ISearchUserParams } from './typing/interfaces/ISearchUserParams';
 import { UsersService } from './users.service';
 import { User } from './schemas/user.schema';
 
-@Controller('api/users')
+@Controller('users')
 export class UsersController {
   constructor(private readonly usersService: UsersService) {}
 
