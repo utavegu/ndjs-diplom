@@ -2,7 +2,6 @@ import {
   Controller,
   HttpCode,
   HttpStatus,
-  UseFilters,
   Get,
   Query,
   UseGuards,
@@ -13,7 +12,6 @@ import {
 } from '@nestjs/common';
 import { UsersService } from '../users/users.service';
 import { User } from '../users/schemas/user.schema';
-import { MyExceptionFilter } from '../../helpers/exception.filter';
 import { ISearchUserParams } from '../users/typing/interfaces/ISearchUserParams';
 // import { Role } from './role.decorator';
 // import { Roles } from '../users/typing/enums/roles.enum';
@@ -32,7 +30,6 @@ export class UsersManagementController {
   @UseGuards(AdminRoleGuard)
   @HttpCode(HttpStatus.CREATED)
   @UsePipes(new ValidationPipe(createUserValidationSchema))
-  @UseFilters(MyExceptionFilter)
   async adminCreateUser(
     @Body() body: UserDto,
     @Request() request,
@@ -44,7 +41,6 @@ export class UsersManagementController {
   // @Role(Roles.ADMIN) // TODO: если сможешь починить эту штуку, по-хорошему гарду повесить на весь контроллер
   @UseGuards(AdminRoleGuard)
   @HttpCode(HttpStatus.OK)
-  @UseFilters(MyExceptionFilter)
   async fetchUsersForAdmin(
     @Query() queryParams: ISearchUserParams,
   ): Promise<User[]> {
@@ -55,7 +51,6 @@ export class UsersManagementController {
   // @Role(Roles.MANAGER)
   @UseGuards(ManagerRoleGuard)
   @HttpCode(HttpStatus.OK)
-  @UseFilters(MyExceptionFilter)
   async fetchUsersForManager(
     @Query() queryParams: ISearchUserParams,
   ): Promise<User[]> {

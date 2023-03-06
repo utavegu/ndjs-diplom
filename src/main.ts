@@ -4,6 +4,7 @@ import { AppModule } from './app.module';
 
 import * as session from 'express-session'; // Почитай документацию на счет того, что это не взрослый подход, не продакшен - https://docs.nestjs.com/techniques/session
 import * as passport from 'passport';
+import { MyExceptionFilter } from './helpers/exception.filter';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
@@ -11,6 +12,7 @@ async function bootstrap() {
   app
     // .use(cookieParser())
     .setGlobalPrefix('api')
+    .useGlobalFilters(new MyExceptionFilter())
     .use(session({
       secret: 'z73Sah701Jaxf3', // В ЕНВ
       resave: false,

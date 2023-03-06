@@ -1,13 +1,5 @@
-import {
-  Controller,
-  Get,
-  Param,
-  UseFilters,
-  HttpStatus,
-  HttpCode,
-} from '@nestjs/common';
+import { Controller, Get, Param, HttpStatus, HttpCode } from '@nestjs/common';
 import { ID } from 'src/types/id';
-import { MyExceptionFilter } from 'src/helpers/exception.filter';
 import { UsersService } from './users.service';
 import { User } from './schemas/user.schema';
 
@@ -19,7 +11,6 @@ export class UsersController {
 
   @Get(':id')
   @HttpCode(HttpStatus.OK)
-  @UseFilters(MyExceptionFilter)
   async findById(@Param('id') id: ID): Promise<User> {
     return await this.usersService.findById(id);
   }
