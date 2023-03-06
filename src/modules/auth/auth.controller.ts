@@ -20,6 +20,7 @@ import { ValidationPipe } from 'src/helpers/validation.pipe';
 import { MyExceptionFilter } from '../../helpers/exception.filter';
 import { JwtAuthGuard } from './jwt.auth.guard';
 import { createUserValidationSchema } from '../users/create.user.validation.schema';
+import { ClientReturnedUserType } from '../users/typing/types/returned-user.type';
 
 @Controller()
 export class AuthController {
@@ -32,7 +33,9 @@ export class AuthController {
   @HttpCode(HttpStatus.CREATED)
   @UsePipes(new ValidationPipe(createUserValidationSchema))
   @UseFilters(MyExceptionFilter)
-  async create(@Body() body: Omit<UserDto, 'role'>): Promise<Partial<User>> {
+  async create(
+    @Body() body: Omit<UserDto, 'role'>,
+  ): Promise<ClientReturnedUserType> {
     return await this.usersService.create(body);
   }
 

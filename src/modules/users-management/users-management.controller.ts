@@ -22,6 +22,7 @@ import { ManagerRoleGuard } from './guards/manager.role.guard';
 import { createUserValidationSchema } from '../users/create.user.validation.schema';
 import { UserDto } from '../users/typing/interfaces/user.dto';
 import { ValidationPipe } from 'src/helpers/validation.pipe';
+import { AdminReturnedUserType } from '../users/typing/types/returned-user.type';
 
 @Controller()
 export class UsersManagementController {
@@ -35,7 +36,7 @@ export class UsersManagementController {
   async adminCreateUser(
     @Body() body: UserDto,
     @Request() request,
-  ): Promise<Partial<User>> {
+  ): Promise<AdminReturnedUserType> {
     return await this.usersService.create(body, request.user);
   }
 

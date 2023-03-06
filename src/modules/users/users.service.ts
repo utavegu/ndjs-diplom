@@ -10,27 +10,31 @@ import { ISearchUserParams } from './typing/interfaces/ISearchUserParams';
 import { IUserService } from './typing/interfaces/IUserService';
 import { UserDto } from './typing/interfaces/user.dto';
 import { Roles } from './typing/enums/roles.enum';
+import { CreateReturnedUserType } from './typing/types/returned-user.type';
 
 @Injectable()
 export class UsersService implements IUserService {
   constructor(@InjectModel(User.name) private UserModel: Model<UserDocument>) { }
 
-  // ПРОМИС ЮЗЕР должен возвращать, НО! + _id и - passwordHash и role
-  async create(data: Partial<UserDto>, loggedUser?: User): Promise<Partial<User>> {
+  async create(data: Partial<UserDto>, loggedUser?: User): Promise<CreateReturnedUserType> {
     try {
       const { password, ...other } = data;
       const passwordHash = await encryptPassword(password);
-      // TODO: Возвращаю слишком много полей. Надо придумать, как возвращать только имя, почту и айдишник, которого, внимание, нет в User! (читай по create и save, а также как расширить юзер прямо тут). Для админа и незарегистированного пользователя возвращать разные наборы полей! Пока что сделал через Partial, но есть надежда, что есть штуки типа select для аналогичных ситуаций
       const newUser = await this.UserModel.create({
         ...other, passwordHash,
         role: loggedUser?.role ? data.role : Roles.CLIENT
       });
-      return {
-        // id: newUser._id, НЕТ В ИНТЕРФЕЙСЕ ЮЗЕРА
+      const returnedUser: CreateReturnedUserType = {
+        id: newUser._id,
         email: newUser.email,
         name: newUser.name,
-        // и еще contactPhone и role, если админ
-      };
+      }
+      if (loggedUser && loggedUser.role === Roles.ADMIN) {
+        returnedUser.contactPhone = newUser.contactPhone;
+        returnedUser.role = newUser.role;
+      }
+      // TODO: Однако, неплохо бы найти способ через Монгуз, наподобии .select (читай по create и save). Тогда Partial уберешь.
+      return returnedUser;
     } catch (err) {
       // TODO: выглядит не очень надежно, вероятно, есть способы лучше. Как вариант, можно было дернуть юзера в базе, но тогда:
       // 1) Лишний запрос в базу (на сколько это плохо?)
