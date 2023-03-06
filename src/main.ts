@@ -10,7 +10,7 @@ async function bootstrap() {
   const app = await NestFactory.create(AppModule);
 
   app
-    // .use(cookieParser())
+    // .use(cookieParser()) // TODO: Вероятно понадобится после прикручивания фронта
     .setGlobalPrefix('api')
     .useGlobalFilters(new MyExceptionFilter())
     .use(session({

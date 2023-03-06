@@ -1,7 +1,6 @@
 import {
   HttpException,
   Injectable,
-  NotFoundException,
   UnauthorizedException,
 } from '@nestjs/common';
 import { User } from '../users/schemas/user.schema';
@@ -19,18 +18,20 @@ export class AuthService {
   ) {}
 
   createToken(payload: {
-    email: User['email'];
+    sub: User['email']; // TODO: или им может быть только айдишник?
     name: User['name'];
     role: User['role'];
   }) {
-    return this.jwtService.sign(payload);
+    const fullPayload = {
+      ...payload,
+      iat: Date.now(),
+      exp: '120s', // TODO: env. И не уверен, что именно в таком формате это делается тут... Да, по хорошему должно быть в Unix Time (iat + exp)
+    };
+    return this.jwtService.sign(fullPayload);
   }
 
-  async login(
-    body: Omit<UserDto, 'name' | 'contactPhone' | 'role'>,
-  ): Promise<User> {
+  async login(body: Pick<UserDto, 'email' | 'password'>): Promise<User> {
     try {
-      // TODO: А что на счёт выставления куки?
       const user = await this.usersService.findByEmail(body.email);
       if (user) {
         const isValidPassword = await comparePasswords(
@@ -38,12 +39,7 @@ export class AuthService {
           user.passwordHash,
         );
         if (isValidPassword) {
-          // Перенес в контроллер
-          // this.createToken({
-          //   email: user.email,
-          //   name: user.name,
-          //   role: user.role,
-          // });
+          // криейт токен был тут, но переехал в контроллер
           return user;
         } else {
           throw new UnauthorizedException('Неверный пароль!');

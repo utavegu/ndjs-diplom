@@ -24,6 +24,7 @@ export class UsersService implements IUserService {
         ...other, passwordHash,
         role: loggedUser?.role ? data.role : Roles.CLIENT
       });
+      // TODO: Пожалуй, правильнее это было сделать на уровне контроллера. Но пока оставлю так, это уже косметика
       const returnedUser: CreateReturnedUserType = {
         id: newUser._id,
         email: newUser.email,

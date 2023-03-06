@@ -14,7 +14,9 @@ export const createUserValidationSchema = Joi.object().keys({
   
   password: Joi
     .string()
-    .pattern(new RegExp('^[a-zA-Z0-9]{3,30}$'))
+    .min(4)
+    .max(32)
+    .pattern(new RegExp('^[a-zA-Z0-9]{4,32}$'))
     .required(),
 
   name: Joi
