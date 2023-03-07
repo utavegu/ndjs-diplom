@@ -5,6 +5,7 @@ import { AppService } from './app.service';
 import { UsersModule } from './modules/users/users.module';
 import { AuthModule } from './modules/auth/auth.module';
 import { UsersManagementModule } from './modules/users-management/users-management.module';
+import { SupportChatModule } from './modules/support-chat/support-chat.module';
 
 @Module({
   imports: [
@@ -16,6 +17,7 @@ import { UsersManagementModule } from './modules/users-management/users-manageme
     UsersModule,
     AuthModule,
     UsersManagementModule,
+    SupportChatModule,
   ],
   controllers: [AppController],
   providers: [AppService],
