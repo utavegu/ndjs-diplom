@@ -5,9 +5,17 @@ import {
   SupportRequest,
   SupportRequestSchema,
 } from './schemas/support-request.schema';
-import { SupportRequestClientService } from './sepport-request-client.service';
-import { SupportRequestEmployeeService } from './support-request-employee.service';
+import { SupportChatGateway } from './support-chat.gateway';
 import { SupportRequestService } from './support-request.service';
+import { SupportRequestClientService } from './support-request-client.service';
+import { SupportRequestEmployeeService } from './support-request-employee.service';
+import { SupportChatController } from './support-chat.controller';
+
+// TODOs
+
+// В ТЗ про фильтры, пайпы и интерсепторы для вебсокетов ничего не сказано вроде, но обкатай по полной программе тут, а то забудешь.
+
+// Оповещения должны быть реализованы через механизм EventEmitter
 
 @Module({
   imports: [
@@ -17,9 +25,11 @@ import { SupportRequestService } from './support-request.service';
     ]),
   ],
   providers: [
+    SupportChatGateway,
     SupportRequestService,
     SupportRequestClientService,
     SupportRequestEmployeeService,
   ],
+  controllers: [SupportChatController],
 })
 export class SupportChatModule {}
