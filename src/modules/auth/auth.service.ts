@@ -8,6 +8,7 @@ import { UserDto } from '../users/typing/interfaces/user.dto';
 import { UsersService } from '../users/users.service';
 import { JwtService } from '@nestjs/jwt';
 import { comparePasswords } from 'src/helpers/encrypting';
+import { ERROR_MESSAGES } from 'src/constants';
 
 @Injectable()
 // TODO: А должен ли сервис авторизации наследоваться от какого-то интерфейса, также как и юзер? Наверное, хороший тон, как минимум, потому лучше допили.
@@ -25,7 +26,7 @@ export class AuthService {
     const fullPayload = {
       ...payload,
       iat: Date.now(),
-      exp: '120s', // TODO: env. И не уверен, что именно в таком формате это делается тут... Да, по хорошему должно быть в Unix Time (iat + exp)
+      // exp: '120s', // TODO: env. И не уверен, что именно в таком формате это делается тут... Да, по хорошему должно быть в Unix Time (iat + exp)
     };
     return this.jwtService.sign(fullPayload);
   }
@@ -45,10 +46,7 @@ export class AuthService {
           throw new UnauthorizedException('Неверный пароль!');
         }
       } else {
-        throw new UnauthorizedException(
-          'Такой пользователь не зарегистрирован!',
-          // Почему опять в консоль пуляешь, а не в ответ?.. ты как-то через раз это делаешь...
-        );
+        throw new UnauthorizedException(ERROR_MESSAGES.USER_IS_NOT_REGISTERED);
       }
     } catch (err) {
       throw new HttpException(err.message, err.status);

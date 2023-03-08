@@ -1,8 +1,20 @@
-import { Controller, Get, Param, HttpStatus, HttpCode } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Param,
+  HttpStatus,
+  HttpCode,
+  UseGuards,
+  Post,
+  Request,
+  Body,
+} from '@nestjs/common';
 import { ID } from 'src/types/id';
 import { SupportRequestService } from './support-request.service';
 import { SupportRequestClientService } from './support-request-client.service';
 import { SupportRequestEmployeeService } from './support-request-employee.service';
+import { ClientRoleGuard } from 'src/helpers/guards/client.role.guard';
+import { CreateSupportRequestDto } from './typing/interfaces/support-chat.interface';
 
 @Controller()
 export class SupportChatController {
@@ -12,16 +24,23 @@ export class SupportChatController {
     private readonly supportRequestEmployeeService: SupportRequestEmployeeService,
   ) {}
 
-  // @Get(':id')
-  // @HttpCode(HttpStatus.OK)
-  // async findById(@Param('id') id: ID): Promise<User> {
-  //   return await this.usersService.findById(id);
-  // }
+  // Позволяет пользователю с ролью client создать обращение в техподдержку
+  @Post('client/support-requests')
+  @UseGuards(ClientRoleGuard)
+  @HttpCode(HttpStatus.OK)
+  async createClientMessage(
+    @Body('text') text: CreateSupportRequestDto['text'],
+    @Request() request,
+  ) {
+    return await this.supportRequestClientService.createSupportRequest({
+      user: request?.user?.id,
+      text,
+    });
+  }
 
   /*
-API:
 
-POST /api/client/support-requests/ - Позволяет пользователю с ролью client создать обращение в техподдержку.
+API:
 
 GET /api/client/support-requests/ - Позволяет пользователю с ролью client получить список обращений для текущего пользователя.
 

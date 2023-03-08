@@ -6,10 +6,10 @@ import {
 } from '@nestjs/common';
 import { Reflector } from '@nestjs/core';
 import { AuthGuard } from '@nestjs/passport';
-import { Roles } from '../../users/typing/enums/roles.enum';
+import { Roles } from '../../modules/users/typing/enums/roles.enum';
 
 @Injectable()
-export class ManagerRoleGuard extends AuthGuard('jwt') {
+export class AdminRoleGuard extends AuthGuard('jwt') {
   constructor(private reflector: Reflector) {
     super();
   }
@@ -28,8 +28,8 @@ export class ManagerRoleGuard extends AuthGuard('jwt') {
     if (!user) {
       throw new UnauthorizedException();
     }
-    if (user.role !== Roles.MANAGER) {
-      throw new ForbiddenException('Доступно только менеджерам!');
+    if (user.role !== Roles.ADMIN) {
+      throw new ForbiddenException('Доступно только администраторам!');
     }
     return user;
   }

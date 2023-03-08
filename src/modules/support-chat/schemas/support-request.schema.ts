@@ -1,19 +1,41 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { Document, ObjectId } from 'mongoose';
 import { Message } from './message.schema';
+import { Schema as MongooseSchema } from 'mongoose';
 
 @Schema()
 export class SupportRequest {
-  @Prop({ required: true, unique: false })
+  /** Автор данного обращения */
+  @Prop({
+    required: true,
+    unique: false,
+    type: MongooseSchema.Types.ObjectId,
+    ref: 'User',
+  })
   user: ObjectId;
 
-  @Prop({ required: true, unique: false })
+  /** Когда создано обращение */
+  @Prop({
+    required: true,
+    unique: false,
+  })
   createAt: Date;
 
-  @Prop({ required: false, unique: false })
+  /** Сообщения данной переписки */
+  @Prop({
+    required: false,
+    unique: false,
+    type: [MongooseSchema.Types.ObjectId],
+    ref: 'Message',
+  })
   messages: [Message];
 
-  @Prop({ required: false, unique: false })
+  /** Открыт ли еще вопрос */
+  @Prop({
+    required: false,
+    unique: false,
+    default: true,
+  })
   isActive: boolean;
 }
 

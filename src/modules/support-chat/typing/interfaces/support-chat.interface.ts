@@ -1,3 +1,4 @@
+/* eslint-disable prettier/prettier */
 import { ID } from 'src/types/id';
 import { Message } from '../../schemas/message.schema';
 import { SupportRequest } from '../../schemas/support-request.schema';
@@ -24,6 +25,13 @@ export interface GetChatListParams {
   isActive: boolean;
 }
 
+export interface CreateSupportRequestResponse {
+  id: string;
+  createdAt: string;
+  isActive: boolean;
+  hasNewMessages: boolean;
+}
+
 export interface ISupportRequestService {
   findSupportRequests(params: GetChatListParams): Promise<SupportRequest[]>;
   sendMessage(data: SendMessageDto): Promise<Message>;
@@ -34,7 +42,7 @@ export interface ISupportRequestService {
 }
 
 export interface ISupportRequestClientService {
-  createSupportRequest(data: CreateSupportRequestDto): Promise<SupportRequest>;
+  createSupportRequest(data: CreateSupportRequestDto): Promise<CreateSupportRequestResponse[]>;
   markMessagesAsRead(params: MarkMessagesAsReadDto);
   getUnreadCount(supportRequest: ID): Promise<Message[]>;
 }
