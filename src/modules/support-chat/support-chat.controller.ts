@@ -8,12 +8,13 @@ import {
   Post,
   Request,
   Body,
+  Query,
 } from '@nestjs/common';
-import { ID } from 'src/types/id';
 import { SupportRequestService } from './support-request.service';
 import { SupportRequestClientService } from './support-request-client.service';
 import { SupportRequestEmployeeService } from './support-request-employee.service';
 import { ClientRoleGuard } from 'src/helpers/guards/client.role.guard';
+import { ManagerRoleGuard } from 'src/helpers/guards/manager.role.guard';
 import { CreateSupportRequestDto } from './typing/interfaces/support-chat.interface';
 
 @Controller()
@@ -38,13 +39,36 @@ export class SupportChatController {
     });
   }
 
+  // Позволяет пользователю с ролью client получить список обращений для текущего пользователя.
+  @Get('client/support-requests')
+  @UseGuards(ClientRoleGuard)
+  @HttpCode(HttpStatus.OK)
+  async clientFetchAllAppeals(@Request() request, @Query() query) {
+    return await this.supportRequestService.findSupportRequests({
+      ...query,
+      user: request?.user?.id,
+      isActive: true, // TODO: Не понимаю как это поле должно выставляться тут
+      role: request?.user?.role,
+    });
+  }
+
+  // Позволяет пользователю с ролью manager получить список обращений от клиентов.
+  @Get('manager/support-requests')
+  @UseGuards(ManagerRoleGuard)
+  @HttpCode(HttpStatus.OK)
+  async managerFetchAllAppeals(@Request() request, @Query() query) {
+    return await this.supportRequestService.findSupportRequests({
+      ...query,
+      user: '64087239d2f336ced136dbfa', // Моковый ID клиента из базы, должен приходить из интерфейса менеджера, я так понимаю.
+      isActive: true, // TODO: Не понимаю как это поле должно выставляться тут
+      role: request?.user?.role,
+    });
+  }
   /*
 
 API:
 
-GET /api/client/support-requests/ - Позволяет пользователю с ролью client получить список обращений для текущего пользователя.
-
-GET /api/manager/support-requests/ - Позволяет пользователю с ролью manager получить список обращений от клиентов.
+// Вот в следующих трех как раз из парамсов должно доставаться, сразу деструктурируй id чата
 
 GET /api/common/support-requests/:id/messages - Позволяет пользователю с ролью manager или client получить все сообщения из чата.
 

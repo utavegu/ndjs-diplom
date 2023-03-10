@@ -2,7 +2,7 @@
 import { BadRequestException, HttpException, Injectable, NotFoundException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
-import { DEFAULT_USERS_LIMIT, DEFAULT_USERS_OFFSET, ERROR_MESSAGES } from 'src/constants';
+import { DEFAULT_LIMIT, DEFAULT_OFFSET, ERROR_MESSAGES } from 'src/constants';
 import { encryptPassword } from 'src/helpers/encrypting';
 import { ID } from 'src/types/id';
 import { User, UserDocument } from './schemas/user.schema';
@@ -22,7 +22,7 @@ export class UsersService implements IUserService {
       const passwordHash = await encryptPassword(password);
       const newUser = await this.UserModel.create({
         ...other, passwordHash,
-        role: loggedUser?.role ? data.role : Roles.CLIENT
+        role: loggedUser?.role === Roles.ADMIN ? data.role : Roles.CLIENT
       });
       // TODO: Пожалуй, правильнее это было сделать на уровне контроллера. Но пока оставлю так, это уже косметика
       const returnedUser: CreateReturnedUserType = {
@@ -78,8 +78,8 @@ export class UsersService implements IUserService {
   async findAll(params: ISearchUserParams): Promise<User[]> {
     try {
       const {
-        limit = DEFAULT_USERS_LIMIT,
-        offset = DEFAULT_USERS_OFFSET,
+        limit = DEFAULT_LIMIT,
+        offset = DEFAULT_OFFSET,
       } = params;
 
       // TODO: Сделать большую коллекцию юзеров через "монго шел -> инсерт мэни" и потестить разные кейсы

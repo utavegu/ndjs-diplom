@@ -20,7 +20,7 @@ import { ISupportRequestEmployeeService, MarkMessagesAsReadDto } from './typing/
 export class SupportRequestEmployeeService implements ISupportRequestEmployeeService {
   constructor(
     @InjectModel(Message.name) private MessageModel: Model<MessageDocument>,
-    @InjectModel(SupportRequest.name) SupportRequestModel: Model<SupportRequestDocument>
+    @InjectModel(SupportRequest.name) private SupportRequestModel: Model<SupportRequestDocument>
   ) { }
 
   markMessagesAsRead(params: MarkMessagesAsReadDto) {

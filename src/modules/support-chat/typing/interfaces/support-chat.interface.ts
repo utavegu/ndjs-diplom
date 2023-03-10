@@ -1,4 +1,5 @@
 /* eslint-disable prettier/prettier */
+import { User } from 'src/modules/users/schemas/user.schema';
 import { ID } from 'src/types/id';
 import { Message } from '../../schemas/message.schema';
 import { SupportRequest } from '../../schemas/support-request.schema';
@@ -23,6 +24,7 @@ export interface MarkMessagesAsReadDto {
 export interface GetChatListParams {
   user: ID | null;
   isActive: boolean;
+  role: User['role'] // Добавил сам, в изначальном интерфейсе не было
 }
 
 export interface CreateSupportRequestResponse {
