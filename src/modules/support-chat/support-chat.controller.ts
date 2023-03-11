@@ -16,6 +16,8 @@ import { SupportRequestEmployeeService } from './support-request-employee.servic
 import { ClientRoleGuard } from 'src/helpers/guards/client.role.guard';
 import { ManagerRoleGuard } from 'src/helpers/guards/manager.role.guard';
 import { CreateSupportRequestDto } from './typing/interfaces/support-chat.interface';
+import { NoAdminRoleGuard } from 'src/helpers/guards/no-admin.role.guard';
+import { ID } from 'src/types/id';
 
 @Controller()
 export class SupportChatController {
@@ -64,13 +66,19 @@ export class SupportChatController {
       role: request?.user?.role,
     });
   }
+
+  // Позволяет пользователю с ролью manager или client получить все сообщения из чата.
+  @Get('common/support-requests/:id/messages')
+  @UseGuards(NoAdminRoleGuard)
+  @HttpCode(HttpStatus.OK)
+  async fetchChatHistory(@Request() request, @Param('id') id: ID) {
+    return await this.supportRequestService.getMessages(id, request);
+  }
   /*
 
 API:
 
 // Вот в следующих трех как раз из парамсов должно доставаться, сразу деструктурируй id чата
-
-GET /api/common/support-requests/:id/messages - Позволяет пользователю с ролью manager или client получить все сообщения из чата.
 
 POST /api/common/support-requests/:id/messages - Позволяет пользователю с ролью manager или client отправлять сообщения в чат.
 

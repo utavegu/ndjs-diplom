@@ -1,5 +1,5 @@
 /* eslint-disable prettier/prettier */
-import { Injectable } from '@nestjs/common';
+import { ForbiddenException, Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { DEFAULT_LIMIT, DEFAULT_OFFSET } from 'src/constants';
@@ -29,10 +29,10 @@ export class SupportRequestService implements ISupportRequestService {
 
     if (role === Roles.MANAGER) {
       return await this.SupportRequestModel
-      .find({ user, isActive })
-      .limit(limit)
-      .skip(offset)
-      .populate({ path: 'user', select: 'id name email contactPhone' });
+        .find({ user, isActive })
+        .limit(limit)
+        .skip(offset)
+        .populate({ path: 'user', select: 'id name email contactPhone' });
     }
   }
 
@@ -40,8 +40,22 @@ export class SupportRequestService implements ISupportRequestService {
     throw new Error('Method not implemented.');
   }
 
-  async getMessages(supportRequest: ID): Promise<Message[]> {
-    throw new Error('Method not implemented.');
+  async getMessages(supportRequest: ID, request): Promise<Message[]> {
+    const chat = await this.SupportRequestModel.findById(supportRequest)
+      .populate({
+        path: 'messages',
+        select: '-__v',
+        populate: {
+          path: 'author',
+          select: 'id: _id name'
+        },
+      });
+
+    if (request?.user?.role === Roles.CLIENT && chat.user.toString() !== request.user.id) {
+      throw new ForbiddenException('У вас нет прав доступа!');
+    }
+
+    return chat.messages;
   }
 
   subscribe(handler: (supportRequest: SupportRequest, message: Message) => void): () => void {
