@@ -36,8 +36,24 @@ export class SupportRequestService implements ISupportRequestService {
     }
   }
 
-  async sendMessage(data: SendMessageDto): Promise<Message> {
-    throw new Error('Method not implemented.');
+  async sendMessage(data: SendMessageDto, request): Promise<Message> {
+    const { author, supportRequest, text } = data;
+    const chat = await this.SupportRequestModel.findById(supportRequest);
+
+    // TODO: По идее это должно быть в гарде, но не знаю как там достать chat
+    if (request?.user?.role === Roles.CLIENT && chat.user.toString() !== request.user.id) {
+      throw new ForbiddenException('У вас нет прав доступа!');
+    }
+
+    const newMessage = await (await this.MessageModel.create({ author, text })).populate({
+      path: 'author',
+      select: 'id: _id name'
+    });
+
+    await chat.updateOne({ $push: { messages: newMessage } });
+
+    // TODO: Понять как возвращать без __v
+    return newMessage;
   }
 
   async getMessages(supportRequest: ID, request): Promise<Message[]> {
@@ -51,6 +67,7 @@ export class SupportRequestService implements ISupportRequestService {
         },
       });
 
+    // TODO: По идее это должно быть в гарде, но не знаю как там достать chat
     if (request?.user?.role === Roles.CLIENT && chat.user.toString() !== request.user.id) {
       throw new ForbiddenException('У вас нет прав доступа!');
     }

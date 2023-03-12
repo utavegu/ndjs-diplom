@@ -36,7 +36,7 @@ export interface CreateSupportRequestResponse {
 
 export interface ISupportRequestService {
   findSupportRequests(params: GetChatListParams): Promise<SupportRequest[]>;
-  sendMessage(data: SendMessageDto): Promise<Message>;
+  sendMessage(data: SendMessageDto, request): Promise<Message>; // добавил реквест
   getMessages(supportRequest: ID, request): Promise<Message[]>; // добавил реквест
   subscribe(
     handler: (supportRequest: SupportRequest, message: Message) => void,

@@ -74,13 +74,29 @@ export class SupportChatController {
   async fetchChatHistory(@Request() request, @Param('id') id: ID) {
     return await this.supportRequestService.getMessages(id, request);
   }
+
+  // Позволяет пользователю с ролью manager или client отправлять сообщения в чат.
+  @Post('common/support-requests/:id/messages')
+  @UseGuards(NoAdminRoleGuard)
+  @HttpCode(HttpStatus.OK)
+  async sendMessage(
+    @Request() request,
+    @Param('id') chatId: ID,
+    @Body('text') text: CreateSupportRequestDto['text'],
+  ) {
+    return await this.supportRequestService.sendMessage(
+      {
+        author: request?.user?.id,
+        supportRequest: chatId,
+        text,
+      },
+      request,
+    );
+  }
+
   /*
 
 API:
-
-// Вот в следующих трех как раз из парамсов должно доставаться, сразу деструктурируй id чата
-
-POST /api/common/support-requests/:id/messages - Позволяет пользователю с ролью manager или client отправлять сообщения в чат.
 
 POST /api/common/support-requests/:id/messages/read - Позволяет пользователю с ролью manager или client отправлять отметку, что сообщения прочитаны.
 
