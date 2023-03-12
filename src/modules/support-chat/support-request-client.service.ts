@@ -46,6 +46,7 @@ export class SupportRequestClientService implements ISupportRequestClientService
 
   // Метод ISupportRequestClientService.markMessagesAsRead должен выставлять текущую дату в поле readAt всем сообщениям, которые не были прочитаны и были отправлены не пользователем.
   markMessagesAsRead(params: MarkMessagesAsReadDto) {
+    // Реализован в сервисе работников
     throw new Error('Method not implemented.');
   }
 

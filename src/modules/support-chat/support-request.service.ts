@@ -9,6 +9,8 @@ import { Message, MessageDocument } from './schemas/message.schema';
 import { SupportRequest, SupportRequestDocument } from './schemas/support-request.schema';
 import { GetChatListParams, ISupportRequestService, SendMessageDto } from './typing/interfaces/support-chat.interface';
 
+// TODO: Добавить трайкетчи, необходимые проверки. А в контроллере валидэйшн пайпы. Вообще во всех сервисах чата
+
 @Injectable()
 export class SupportRequestService implements ISupportRequestService {
   constructor(

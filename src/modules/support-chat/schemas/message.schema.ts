@@ -32,8 +32,9 @@ export class Message {
   @Prop({
     required: false,
     unique: false,
+    default: null, // если его корректно использовать так... А если поле не реквайред, у него нет дефолтного значения и оно не было заполнено - считается ли оно null? Потести. TODO.
   })
-  readAt: Date;
+  readAt: Date | null;
 }
 
 export type MessageDocument = Message & Document;

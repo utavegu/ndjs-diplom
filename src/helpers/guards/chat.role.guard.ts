@@ -9,7 +9,7 @@ import { AuthGuard } from '@nestjs/passport';
 import { Roles } from '../../modules/users/typing/enums/roles.enum';
 
 @Injectable()
-export class NoAdminRoleGuard extends AuthGuard('jwt') {
+export class ChatRoleGuard extends AuthGuard('jwt') {
   constructor(private reflector: Reflector) {
     super();
   }

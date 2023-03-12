@@ -15,8 +15,8 @@ import { SupportRequestClientService } from './support-request-client.service';
 import { SupportRequestEmployeeService } from './support-request-employee.service';
 import { ClientRoleGuard } from 'src/helpers/guards/client.role.guard';
 import { ManagerRoleGuard } from 'src/helpers/guards/manager.role.guard';
+import { ChatRoleGuard } from 'src/helpers/guards/chat.role.guard';
 import { CreateSupportRequestDto } from './typing/interfaces/support-chat.interface';
-import { NoAdminRoleGuard } from 'src/helpers/guards/no-admin.role.guard';
 import { ID } from 'src/types/id';
 
 @Controller()
@@ -69,7 +69,7 @@ export class SupportChatController {
 
   // Позволяет пользователю с ролью manager или client получить все сообщения из чата.
   @Get('common/support-requests/:id/messages')
-  @UseGuards(NoAdminRoleGuard)
+  @UseGuards(ChatRoleGuard)
   @HttpCode(HttpStatus.OK)
   async fetchChatHistory(@Request() request, @Param('id') id: ID) {
     return await this.supportRequestService.getMessages(id, request);
@@ -77,7 +77,7 @@ export class SupportChatController {
 
   // Позволяет пользователю с ролью manager или client отправлять сообщения в чат.
   @Post('common/support-requests/:id/messages')
-  @UseGuards(NoAdminRoleGuard)
+  @UseGuards(ChatRoleGuard)
   @HttpCode(HttpStatus.OK)
   async sendMessage(
     @Request() request,
@@ -94,11 +94,24 @@ export class SupportChatController {
     );
   }
 
+  // Позволяет пользователю с ролью manager или client отправлять отметку, что сообщения прочитаны.
+  @Post('common/support-requests/:id/messages/read')
+  @UseGuards(ChatRoleGuard)
+  @HttpCode(HttpStatus.OK)
+  putMark(
+    @Request() request,
+    @Param('id') chatId: ID,
+    @Body('createdBefore') createdBefore: string, // TODO: Без пайпа - опасно
+  ) {
+    return this.supportRequestEmployeeService.markMessagesAsRead({
+      user: request?.user?.id,
+      supportRequest: chatId,
+      createdBefore: new Date(createdBefore) || new Date('12.03.23'), // TODO: Вообще не понял, что это за поле и зачем оно
+    });
+  }
+
   /*
-
 API:
-
-POST /api/common/support-requests/:id/messages/read - Позволяет пользователю с ролью manager или client отправлять отметку, что сообщения прочитаны.
 
 В ГЭТЭВЭЕ БУДЕШЬ ЖИТЬ, А ПОКА ТУТ ДЛЯ ПОНИМАНИЯ ОБЩЕЙ КАРТИНЫ
 message: subscribeToChat payload: chatId - Позволяет пользователю с ролью manager или client получать новые сообщения в чате через WebSocket.
