@@ -8,6 +8,8 @@ import {
 // import { BookCommentsService } from './book-comments.service';
 
 
+// message: subscribeToChat payload: chatId - Позволяет пользователю с ролью manager или client получать новые сообщения в чате через WebSocket.
+
 @WebSocketGateway({ cors: true })
 export class SupportChatGateway {
   constructor(

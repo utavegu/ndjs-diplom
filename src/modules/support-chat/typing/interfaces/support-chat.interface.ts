@@ -46,11 +46,11 @@ export interface ISupportRequestService {
 export interface ISupportRequestClientService {
   createSupportRequest(data: CreateSupportRequestDto): Promise<CreateSupportRequestResponse[]>;
   markMessagesAsRead(params: MarkMessagesAsReadDto);
-  getUnreadCount(supportRequest: ID): Promise<Message[]>;
+  getUnreadCount(supportRequest: ID, request): Promise<number>; // добавил реквест и исправил ошибку интерфейса
 }
 
 export interface ISupportRequestEmployeeService {
   markMessagesAsRead(params: MarkMessagesAsReadDto);
-  getUnreadCount(supportRequest: ID): Promise<Message[]>;
+  getUnreadCount(supportRequest: ID, request): Promise<number>; // добавил реквест и исправил ошибку интерфейса
   closeRequest(supportRequest: ID): Promise<void>;
 }

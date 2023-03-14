@@ -3,6 +3,7 @@ import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { ID } from 'src/types/id';
+import { Roles } from '../users/typing/enums/roles.enum';
 import { Message, MessageDocument } from './schemas/message.schema';
 import { SupportRequest, SupportRequestDocument } from './schemas/support-request.schema';
 import { CreateSupportRequestDto, CreateSupportRequestResponse, ISupportRequestClientService, MarkMessagesAsReadDto } from './typing/interfaces/support-chat.interface';
@@ -51,8 +52,16 @@ export class SupportRequestClientService implements ISupportRequestClientService
   }
 
   // Метод ISupportRequestClientService.getUnreadCount должен возвращать количество сообщений, которые были отправлены любым сотрудником поддержки и не отмечены прочитанным.
-  async getUnreadCount(supportRequest: ID): Promise<Message[]> {
-    throw new Error('Method not implemented.');
-  }
+  async getUnreadCount(supportRequest: ID, request): Promise<number> {
+    const managerId = request.user.role === Roles.MANAGER && request.user.id;
+    const chat = await this.SupportRequestModel.findById(supportRequest)
+      .populate({
+        path: 'messages',
+        select: 'author readAt',
+      });
 
+    const managerUnreadMessagesCount = chat.messages.filter(message => message.author.toString() === managerId && !message.readAt).length;
+
+    return managerUnreadMessagesCount;
+  }
 }

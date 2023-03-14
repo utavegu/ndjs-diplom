@@ -109,11 +109,4 @@ export class SupportChatController {
       createdBefore: new Date(createdBefore) || new Date('12.03.23'), // TODO: Вообще не понял, что это за поле и зачем оно
     });
   }
-
-  /*
-API:
-
-В ГЭТЭВЭЕ БУДЕШЬ ЖИТЬ, А ПОКА ТУТ ДЛЯ ПОНИМАНИЯ ОБЩЕЙ КАРТИНЫ
-message: subscribeToChat payload: chatId - Позволяет пользователю с ролью manager или client получать новые сообщения в чате через WebSocket.
-*/
 }
