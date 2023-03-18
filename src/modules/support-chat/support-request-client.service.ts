@@ -18,6 +18,7 @@ export class SupportRequestClientService implements ISupportRequestClientService
   async createSupportRequest(data: CreateSupportRequestDto): Promise<CreateSupportRequestResponse[]> {
     const { user, text } = data;
     if (user) {
+      // TODO: Тут, пожалуй, следует дергать sendMessage из суппорт-реквеста, для отправки нового сообщения, если чатик уже есть
       const newMessage = await this.MessageModel.create({ author: user, text });
       const appeal = await this.SupportRequestModel.findOne({ user });
 

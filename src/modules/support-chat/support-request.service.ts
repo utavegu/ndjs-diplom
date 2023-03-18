@@ -1,6 +1,7 @@
 /* eslint-disable prettier/prettier */
 import { ForbiddenException, Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
+import { EventEmitter2, OnEvent } from '@nestjs/event-emitter';
 import { Model } from 'mongoose';
 import { DEFAULT_LIMIT, DEFAULT_OFFSET } from 'src/constants';
 import { ID } from 'src/types/id';
@@ -15,7 +16,8 @@ import { GetChatListParams, ISupportRequestService, SendMessageDto } from './typ
 export class SupportRequestService implements ISupportRequestService {
   constructor(
     @InjectModel(Message.name) private MessageModel: Model<MessageDocument>,
-    @InjectModel(SupportRequest.name) private SupportRequestModel: Model<SupportRequestDocument>
+    @InjectModel(SupportRequest.name) private SupportRequestModel: Model<SupportRequestDocument>,
+    private eventEmitter: EventEmitter2
   ) { }
 
   async findSupportRequests(params: GetChatListParams & { limit: number, offset: number }): Promise<SupportRequest[]> {
@@ -54,6 +56,8 @@ export class SupportRequestService implements ISupportRequestService {
 
     await chat.updateOne({ $push: { messages: newMessage } });
 
+    this.subscribe(chat, newMessage);
+
     // TODO: Понять как возвращать без __v
     return newMessage;
   }
@@ -77,8 +81,15 @@ export class SupportRequestService implements ISupportRequestService {
     return chat.messages;
   }
 
-  subscribe(handler: (supportRequest: SupportRequest, message: Message) => void): () => void {
-    throw new Error('Method not implemented.');
+  // TODO: Не понимаю как должно работать, пока поменяю интерфейс
+  // subscribe(handler: (supportRequest: SupportRequest, message: Message) => void): () => void {
+  subscribe(supportRequest: SupportRequest, message: Message): void {
+    console.log(`В чате от ${supportRequest.user} новое сообщение: ${message.text}!`)
+    this.eventEmitter.emit('newMessage', {
+      supportRequest,
+      message,
+    });
+    return;
   }
 
 }

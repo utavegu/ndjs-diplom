@@ -38,9 +38,11 @@ export interface ISupportRequestService {
   findSupportRequests(params: GetChatListParams): Promise<SupportRequest[]>;
   sendMessage(data: SendMessageDto, request): Promise<Message>; // добавил реквест
   getMessages(supportRequest: ID, request): Promise<Message[]>; // добавил реквест
-  subscribe(
-    handler: (supportRequest: SupportRequest, message: Message) => void,
-  ): () => void;
+  // subscribe(
+  //   handler: (supportRequest: SupportRequest, message: Message) => void,
+  // ): () => void;
+  // TODO: Пока поменяю интерфей сабскрайба, так как не понимаю, как он должен работать.
+  subscribe(supportRequest: SupportRequest, message: Message): void;
 }
 
 export interface ISupportRequestClientService {
