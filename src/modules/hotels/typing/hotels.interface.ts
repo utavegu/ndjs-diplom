@@ -14,7 +14,7 @@ interface UpdateHotelParams {
 }
 
 interface IHotelService {
-  create(data: CreateHotelDto): Promise<Hotel>;
+  create(data: CreateHotelDto): Promise<Partial<Hotel> & { id: ID }>;
   findById(id: ID): Promise<Hotel>;
   search(params: SearchHotelParams): Promise<Hotel[]>;
   update(id: ID, data: UpdateHotelParams): Promise<Hotel>;

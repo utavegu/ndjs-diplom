@@ -1,4 +1,13 @@
-import { Body, Controller, Get, Post, Put, UsePipes } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Get,
+  Post,
+  Put,
+  UseGuards,
+  UsePipes,
+} from '@nestjs/common';
+import { AdminRoleGuard } from 'src/helpers/guards/admin.role.guard';
 import { ValidationPipe } from 'src/helpers/validation.pipe';
 import { HotelsRoomsService } from './hotels-rooms.service';
 import { HotelsService } from './hotels.service';
@@ -26,6 +35,7 @@ export class HotelsController {
 
   // Добавление гостиницы
   @Post('admin/hotels')
+  @UseGuards(AdminRoleGuard)
   @UsePipes(new ValidationPipe(createHotelValidationSchema))
   addHotel(@Body() body: CreateHotelDto) {
     return this.hotelsService.create(body);

@@ -10,8 +10,13 @@ import { CreateHotelDto, IHotelService, SearchHotelParams, UpdateHotelParams } f
 export class HotelsService implements IHotelService {
   constructor(@InjectModel(Hotel.name) private HotelModel: Model<HotelDocument>) { }
 
-  async create(data: CreateHotelDto): Promise<Hotel> {
-    return await this.HotelModel.create(data);
+  async create(data: CreateHotelDto): Promise<Partial<Hotel> & { id: ID }> {
+    const newHotel = await this.HotelModel.create(data);
+    return {
+      id: newHotel._id,
+      title: newHotel.title,
+      description: newHotel.description,
+    }
   }
 
   async findById(id: ID): Promise<Hotel> {
