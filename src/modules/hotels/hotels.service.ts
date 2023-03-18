@@ -4,25 +4,25 @@ import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { ID } from 'src/types/id';
 import { Hotel, HotelDocument } from './schemas/hotel.schema';
-import { IHotelService, SearchHotelParams, UpdateHotelParams } from './typing/hotels.interface';
+import { CreateHotelDto, IHotelService, SearchHotelParams, UpdateHotelParams } from './typing/hotels.interface';
 
 @Injectable()
 export class HotelsService implements IHotelService {
   constructor(@InjectModel(Hotel.name) private HotelModel: Model<HotelDocument>) { }
 
-  create(data: any): Promise<Hotel> {
+  async create(data: CreateHotelDto): Promise<Hotel> {
+    return await this.HotelModel.create(data);
+  }
+
+  async findById(id: ID): Promise<Hotel> {
     throw new Error('Method not implemented.');
   }
 
-  findById(id: ID): Promise<Hotel> {
-    throw new Error('Method not implemented.');
-  }
-
-  search(params: SearchHotelParams): Promise<Hotel[]> {
+  async search(params: SearchHotelParams): Promise<Hotel[]> {
     throw new Error('Method not implemented.');
   }
   
-  update(id: ID, data: UpdateHotelParams): Promise<Hotel> {
+  async update(id: ID, data: UpdateHotelParams): Promise<Hotel> {
     throw new Error('Method not implemented.');
   }
   

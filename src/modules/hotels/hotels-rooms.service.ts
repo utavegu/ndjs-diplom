@@ -10,19 +10,19 @@ import { HotelRoomService, SearchRoomsParams } from './typing/hotels.interface';
 export class HotelsRoomsService implements HotelRoomService {
   constructor(@InjectModel(HotelRoom.name) private HotelRoomModel: Model<HotelRoomDocument>) { }
 
-  create(data: Partial<HotelRoom>): Promise<HotelRoom> {
+  async create(data: Partial<HotelRoom>): Promise<HotelRoom> {
     throw new Error('Method not implemented.');
   }
 
-  findById(id: ID): Promise<HotelRoom> {
+  async findById(id: ID): Promise<HotelRoom> {
     throw new Error('Method not implemented.');
   }
 
-  search(params: SearchRoomsParams): Promise<HotelRoom[]> {
+  async search(params: SearchRoomsParams): Promise<HotelRoom[]> {
     throw new Error('Method not implemented.');
   }
 
-  update(id: ID, data: Partial<HotelRoom>): Promise<HotelRoom> {
+  async update(id: ID, data: Partial<HotelRoom>): Promise<HotelRoom> {
     throw new Error('Method not implemented.');
   }
 

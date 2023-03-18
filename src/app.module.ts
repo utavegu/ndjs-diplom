@@ -7,6 +7,7 @@ import { AuthModule } from './modules/auth/auth.module';
 import { UsersManagementModule } from './modules/users-management/users-management.module';
 import { SupportChatModule } from './modules/support-chat/support-chat.module';
 import { EventEmitterModule } from '@nestjs/event-emitter';
+import { HotelsModule } from './modules/hotels/hotels.module';
 
 @Module({
   imports: [
@@ -20,6 +21,7 @@ import { EventEmitterModule } from '@nestjs/event-emitter';
     UsersManagementModule,
     SupportChatModule,
     EventEmitterModule.forRoot(),
+    HotelsModule,
   ],
   controllers: [AppController],
   providers: [AppService],

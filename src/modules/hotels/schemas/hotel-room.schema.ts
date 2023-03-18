@@ -1,6 +1,7 @@
 /* eslint-disable prettier/prettier */
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { Document, ObjectId } from 'mongoose';
+import { Schema as MongooseSchema } from 'mongoose';
 
 @Schema()
 export class HotelRoom {
@@ -8,6 +9,7 @@ export class HotelRoom {
   @Prop({
     required: true,
     unique: false,
+    type: MongooseSchema.Types.ObjectId,
     ref: 'Hotel'
   })
   hotel: ObjectId;

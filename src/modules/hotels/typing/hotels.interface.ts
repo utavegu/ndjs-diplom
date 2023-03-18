@@ -14,7 +14,7 @@ interface UpdateHotelParams {
 }
 
 interface IHotelService {
-  create(data: any): Promise<Hotel>;
+  create(data: CreateHotelDto): Promise<Hotel>;
   findById(id: ID): Promise<Hotel>;
   search(params: SearchHotelParams): Promise<Hotel[]>;
   update(id: ID, data: UpdateHotelParams): Promise<Hotel>;
@@ -37,10 +37,18 @@ interface HotelRoomService {
   update(id: ID, data: Partial<HotelRoom>): Promise<HotelRoom>;
 }
 
+// --------------------------------------------
+
+interface CreateHotelDto {
+  title: string;
+  description?: string;
+}
+
 export {
   SearchHotelParams,
   UpdateHotelParams,
   IHotelService,
   SearchRoomsParams,
   HotelRoomService,
+  CreateHotelDto,
 };

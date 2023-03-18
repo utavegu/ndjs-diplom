@@ -28,7 +28,7 @@ export class UsersManagementController {
 
   @Post('admin/users')
   @UseGuards(AdminRoleGuard)
-  @HttpCode(HttpStatus.CREATED)
+  @HttpCode(HttpStatus.CREATED) // TODO: Вообще он и сам правильно определяет код, так что в этом нет необходимости, по идее...
   @UsePipes(new ValidationPipe(createUserValidationSchema))
   async adminCreateUser(
     @Body() body: UserDto,
