@@ -9,7 +9,7 @@ import { Request, Response } from 'express';
 import { Statuses } from '../modules/users/typing/enums/statuses.enum';
 
 @Catch(HttpException)
-export class MyExceptionFilter implements ExceptionFilter {
+export class ExtendedException implements ExceptionFilter {
   catch(exception: HttpException, host: ArgumentsHost) {
     const ctx = host.switchToHttp();
     const response = ctx.getResponse<Response>();

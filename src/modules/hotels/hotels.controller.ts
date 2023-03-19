@@ -6,6 +6,10 @@ import {
   Put,
   UseGuards,
   UsePipes,
+  UseInterceptors,
+  UploadedFiles,
+  Param,
+  Response,
 } from '@nestjs/common';
 import { AdminRoleGuard } from 'src/helpers/guards/admin.role.guard';
 import { ValidationPipe } from 'src/helpers/validation.pipe';
@@ -13,6 +17,13 @@ import { HotelsRoomsService } from './hotels-rooms.service';
 import { HotelsService } from './hotels.service';
 import { CreateHotelDto } from './typing/hotels.interface';
 import { createHotelValidationSchema } from './validation/create.hotel.validation.schema';
+import { FilesInterceptor } from '@nestjs/platform-express';
+import {
+  FORM_FIELD_NAME,
+  MAX_IMAGES_COUNT,
+  filesInterceptorSetup,
+  imageParseFilePipeInstance,
+} from 'src/helpers/multer.setup';
 
 @Controller()
 export class HotelsController {
@@ -55,13 +66,34 @@ export class HotelsController {
 
   // Добавление номера
   @Post('admin/hotel-rooms')
-  addRoom() {
-    return this.hotelsRoomsService.create;
+  // Гарда админа
+  @UseInterceptors(
+    FilesInterceptor(FORM_FIELD_NAME, MAX_IMAGES_COUNT, filesInterceptorSetup),
+  )
+  addRoom(
+    @UploadedFiles(imageParseFilePipeInstance) files: Express.Multer.File[],
+    @Body() body: any,
+  ) {
+    console.log('files');
+    console.log(files);
+    console.log('body');
+    console.log(body);
+    // return this.hotelsRoomsService.create;
   }
 
   // Изменение описания номера
   @Put('admin/hotel-rooms/:id')
   editRoom() {
     return this.hotelsRoomsService.update;
+  }
+
+  // Для тестирования загруженных файлов
+  @Get('test/getimage/:imgpath')
+  seeUploadedFile(@Param('imgpath') image, @Response() response) {
+    console.log(image);
+    // TODO: А как отдать сразу несколько?
+    const img = response.sendFile(image, { root: './files/img' }); // лишний проброс, просто разбираюсь пока
+    console.log(img);
+    return img;
   }
 }

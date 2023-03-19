@@ -5,6 +5,7 @@ import { HotelsController } from './hotels.controller';
 import { HotelsService } from './hotels.service';
 import { HotelRoom, HotelRoomSchema } from './schemas/hotel-room.schema';
 import { Hotel, HotelSchema } from './schemas/hotel.schema';
+import { MulterModule } from '@nestjs/platform-express';
 
 @Module({
   imports: [
@@ -12,6 +13,9 @@ import { Hotel, HotelSchema } from './schemas/hotel.schema';
       { name: Hotel.name, schema: HotelSchema },
       { name: HotelRoom.name, schema: HotelRoomSchema },
     ]),
+    MulterModule.register({
+      dest: './files/img', // TODO: по хорошему надо ещё посносить директорию файлс и снова опробовать заливку, что он не будет бузить, что такой директории нет. И в ЕНВ сунуть. Тут не секретность, но особенности сервера
+    }),
   ],
   providers: [HotelsService, HotelsRoomsService],
   controllers: [HotelsController],
