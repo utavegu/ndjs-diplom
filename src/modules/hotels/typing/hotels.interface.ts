@@ -44,6 +44,12 @@ interface CreateHotelDto {
   description?: string;
 }
 
+interface CreateHotelRoomDto {
+  description?: string;
+  hotelId: ID;
+  images: File[];
+}
+
 export {
   SearchHotelParams,
   UpdateHotelParams,
@@ -51,4 +57,5 @@ export {
   SearchRoomsParams,
   HotelRoomService,
   CreateHotelDto,
+  CreateHotelRoomDto,
 };

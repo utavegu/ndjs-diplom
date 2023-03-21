@@ -11,7 +11,10 @@ export class HotelsRoomsService implements HotelRoomService {
   constructor(@InjectModel(HotelRoom.name) private HotelRoomModel: Model<HotelRoomDocument>) { }
 
   async create(data: Partial<HotelRoom>): Promise<HotelRoom> {
-    throw new Error('Method not implemented.');
+    return await (await this.HotelRoomModel.create(data)).populate({
+      path: 'hotel',
+      select: '_id title description',
+    }) // TODO: Убрать createdAt, updatedAt и __v
   }
 
   async findById(id: ID): Promise<HotelRoom> {

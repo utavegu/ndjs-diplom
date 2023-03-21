@@ -7,8 +7,8 @@ export const createHotelValidationSchema = Joi.object().keys({
     .min(2)
     .max(40)
     .required(),
-  
-    description: Joi
+
+  description: Joi
     .string()
     .max(300)
     .optional(),

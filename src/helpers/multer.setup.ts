@@ -13,7 +13,7 @@ const MAX_IMAGES_COUNT = 5;
 
 const filesInterceptorSetup = {
   storage: diskStorage({
-    destination: './files/img',
+    destination: './public/img',
     filename: (req, file, callback) => {
       const name = file.originalname.split('.')[0];
       const fileExtName = extname(file.originalname);
@@ -37,6 +37,7 @@ const filesInterceptorSetup = {
 };
 
 const imageParseFilePipeInstance = new ParseFilePipe({
+  fileIsRequired: false,
   validators: [
     new MaxFileSizeValidator({ maxSize: MAX_IMAGE_SIZE_IN_BYTES }),
     new FileTypeValidator({ fileType: /(jpg|jpeg|png|gif|webp)$/ }),
