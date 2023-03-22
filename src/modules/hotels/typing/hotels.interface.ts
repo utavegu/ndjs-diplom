@@ -50,6 +50,13 @@ interface CreateHotelRoomDto {
   images: File[];
 }
 
+interface UpdateHotelRoomDto {
+  description?: string;
+  hotelId: string;
+  isEnabled: boolean | 'true' | 'false'; // Добавил "строку", так как формдата в постмане присылает только строку, в боевых условиях, вероятно, было бы иначе
+  images: File[] | string;
+}
+
 export {
   SearchHotelParams,
   UpdateHotelParams,
@@ -58,4 +65,5 @@ export {
   HotelRoomService,
   CreateHotelDto,
   CreateHotelRoomDto,
+  UpdateHotelRoomDto,
 };

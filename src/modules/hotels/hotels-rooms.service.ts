@@ -26,7 +26,28 @@ export class HotelsRoomsService implements HotelRoomService {
   }
 
   async update(id: ID, data: Partial<HotelRoom>): Promise<HotelRoom> {
-    throw new Error('Method not implemented.');
+    const { hotel, description, isEnabled, images: newImages = [] as unknown as HotelRoom['images'] } = data;
+    const targetRoomPhotos = (await this.HotelRoomModel.findById(id)).images; // TODO: можно ведь, наверное, только одно конкретно поле дергать как-то, чтобы ненужные поля не тащить из документа? 
+    const uniquePhotos = new Set(targetRoomPhotos)
+    if (newImages.length) {
+      newImages.forEach(newImage => {
+        uniquePhotos.add(newImage)  ;
+      })
+    }
+    // TODO: Возвращает с отставанием на 1 шаг, но обновляет в базе актуально (в админке монги покажет правильное значение, после дерганья этой ручки)
+    return await this.HotelRoomModel.findByIdAndUpdate(
+      id,
+      { 
+        hotel, 
+        description,
+        images: Array.from(uniquePhotos),
+        updatedAt: new Date().toISOString(),
+        isEnabled,
+      },
+    ).populate({
+      path: 'hotel',
+      select: '_id title description',
+    }) // TODO: Убрать createdAt, updatedAt и __v)
   }
 
 }

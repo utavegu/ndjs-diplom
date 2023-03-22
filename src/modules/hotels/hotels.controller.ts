@@ -15,7 +15,11 @@ import { AdminRoleGuard } from 'src/helpers/guards/admin.role.guard';
 import { ValidationPipe } from 'src/helpers/validation.pipe';
 import { HotelsRoomsService } from './hotels-rooms.service';
 import { HotelsService } from './hotels.service';
-import { CreateHotelDto, CreateHotelRoomDto } from './typing/hotels.interface';
+import {
+  CreateHotelDto,
+  CreateHotelRoomDto,
+  UpdateHotelRoomDto,
+} from './typing/hotels.interface';
 import { createHotelValidationSchema } from './validation/create.hotel.validation.schema';
 import { FilesInterceptor } from '@nestjs/platform-express';
 import {
@@ -27,6 +31,8 @@ import {
 import { HotelRoom } from './schemas/hotel-room.schema';
 import { ObjectId } from 'mongoose'; // Грязненько, конечно
 import { createHotelRoomValidationSchema } from './validation/create.hotel-room.validation.schema';
+import { ID } from 'src/types/id';
+import { getBooleanValue, getImagesPaths } from './hotels.utils';
 
 @Controller()
 export class HotelsController {
@@ -70,7 +76,7 @@ export class HotelsController {
   // Добавление номера
   @Post('admin/hotel-rooms')
   @UseGuards(AdminRoleGuard)
-  // @UsePipes(new ValidationPipe(createHotelRoomValidationSchema)) TODO: Видимо из-за того, что формдата, ты не работаешь как надо
+  // @UsePipes(new ValidationPipe(createHotelRoomValidationSchema)) // TODO: Видимо из-за того, что формдата, ты не работаешь как надо
   @UseInterceptors(
     FilesInterceptor(FORM_FIELD_NAME, MAX_IMAGES_COUNT, filesInterceptorSetup),
   )
@@ -91,8 +97,25 @@ export class HotelsController {
 
   // Изменение описания номера
   @Put('admin/hotel-rooms/:id')
-  editRoom() {
-    return this.hotelsRoomsService.update;
+  @UseGuards(AdminRoleGuard)
+  // @UsePipes(new ValidationPipe(createHotelRoomValidationSchema)) // TODO: Видимо из-за того, что формдата, ты не работаешь как надо
+  @UseInterceptors(
+    FilesInterceptor(FORM_FIELD_NAME, MAX_IMAGES_COUNT, filesInterceptorSetup),
+  )
+  editRoom(
+    @UploadedFiles(imageParseFilePipeInstance) files: Express.Multer.File[],
+    @Body() body: UpdateHotelRoomDto,
+    @Param('id') id: ID,
+  ) {
+    // mockHotelRoomId - 6419614269f934af13700cbd
+    const isEnabled = getBooleanValue(body.isEnabled);
+    const images = getImagesPaths(files);
+    return this.hotelsRoomsService.update(id, {
+      hotel: body.hotelId as unknown as ObjectId, // Ну совсем дичь какая-то...
+      description: body.description,
+      isEnabled, // TODO: При валидации разрешить принимать только 2 значения строк, как ты сделал с ролями юзеров. И оно должно быть реквайред? Во всяком случае сыпанёт ошибку, если прилетит андефайн
+      images,
+    });
   }
 
   // Для тестирования загруженных файлов

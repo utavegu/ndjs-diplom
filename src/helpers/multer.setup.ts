@@ -17,11 +17,12 @@ const filesInterceptorSetup = {
     filename: (req, file, callback) => {
       const name = file.originalname.split('.')[0];
       const fileExtName = extname(file.originalname);
-      const randomName = Array(4)
-        .fill(null)
-        .map(() => Math.round(Math.random() * 16).toString(16))
-        .join('');
-      callback(null, `${name}-${randomName}${fileExtName}`);
+      // const randomName = Array(4)
+      //   .fill(null)
+      //   .map(() => Math.round(Math.random() * 16).toString(16))
+      //   .join('');
+      // callback(null, `${name}-${randomName}${fileExtName}`); // Пожалуй, не очень хорошая идея
+      callback(null, `${name}${fileExtName}`);
     },
   }),
   limits: {
