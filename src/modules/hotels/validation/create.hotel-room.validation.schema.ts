@@ -2,11 +2,8 @@
 import * as Joi from 'joi';
 
 export const createHotelRoomValidationSchema = Joi.object().keys({
-  description: Joi
-    .string()
-    .optional(),
-
-  hotelId: Joi
-    .string()
-    .required(),
+  body: Joi.object({
+    description: Joi.string().optional(),
+    hotelId: Joi.string().required(),
+  })
 });

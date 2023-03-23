@@ -1,5 +1,4 @@
-/* eslint-disable prettier/prettier */
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { ID } from 'src/types/id';
@@ -8,17 +7,27 @@ import { HotelRoomService, SearchRoomsParams } from './typing/hotels.interface';
 
 @Injectable()
 export class HotelsRoomsService implements HotelRoomService {
-  constructor(@InjectModel(HotelRoom.name) private HotelRoomModel: Model<HotelRoomDocument>) { }
+  constructor(
+    @InjectModel(HotelRoom.name)
+    private HotelRoomModel: Model<HotelRoomDocument>,
+  ) {}
 
   async create(data: Partial<HotelRoom>): Promise<HotelRoom> {
-    return await (await this.HotelRoomModel.create(data)).populate({
+    return await (
+      await this.HotelRoomModel.create(data)
+    ).populate({
       path: 'hotel',
       select: '_id title description',
-    }) // TODO: Убрать createdAt, updatedAt и __v
+    }); // TODO: Убрать createdAt, updatedAt и __v... Хм... снизу сработало, а тут как...
   }
 
   async findById(id: ID): Promise<HotelRoom> {
-    throw new Error('Method not implemented.');
+    return await this.HotelRoomModel.findById(id)
+      .select('-__v -createdAt -updatedAt -isEnabled')
+      .populate({
+        path: 'hotel',
+        select: '_id title description',
+      });
   }
 
   async search(params: SearchRoomsParams): Promise<HotelRoom[]> {
@@ -26,28 +35,31 @@ export class HotelsRoomsService implements HotelRoomService {
   }
 
   async update(id: ID, data: Partial<HotelRoom>): Promise<HotelRoom> {
-    const { hotel, description, isEnabled, images: newImages = [] as unknown as HotelRoom['images'] } = data;
-    const targetRoomPhotos = (await this.HotelRoomModel.findById(id)).images; // TODO: можно ведь, наверное, только одно конкретно поле дергать как-то, чтобы ненужные поля не тащить из документа? 
-    const uniquePhotos = new Set(targetRoomPhotos)
-    if (newImages.length) {
-      newImages.forEach(newImage => {
-        uniquePhotos.add(newImage)  ;
-      })
+    const {
+      hotel,
+      description,
+      isEnabled,
+      images: newImages = [] as unknown as HotelRoom['images'],
+    } = data;
+    const targetRoom = await this.HotelRoomModel.findById(id);
+    if (targetRoom.hotel.toString() !== String(hotel)) {
+      throw new NotFoundException('В данном отеле нет такого номера!');
     }
-    // TODO: Возвращает с отставанием на 1 шаг, но обновляет в базе актуально (в админке монги покажет правильное значение, после дерганья этой ручки)
     return await this.HotelRoomModel.findByIdAndUpdate(
       id,
-      { 
-        hotel, 
+      {
+        hotel,
         description,
-        images: Array.from(uniquePhotos),
+        images: targetRoom.images.concat(newImages),
         updatedAt: new Date().toISOString(),
         isEnabled,
       },
-    ).populate({
-      path: 'hotel',
-      select: '_id title description',
-    }) // TODO: Убрать createdAt, updatedAt и __v)
+      { new: true },
+    )
+      .select('-__v -createdAt -updatedAt')
+      .populate({
+        path: 'hotel',
+        select: '_id title description',
+      });
   }
-
 }

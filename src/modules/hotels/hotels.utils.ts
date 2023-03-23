@@ -16,8 +16,6 @@ const getBooleanValue = (
     return true;
   } else if (booleanString === 'false') {
     return false;
-  } else {
-    throw new Error('Ошибка ввода значения!');
   }
 };
 

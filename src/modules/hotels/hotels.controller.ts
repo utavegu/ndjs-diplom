@@ -28,11 +28,10 @@ import {
   filesInterceptorSetup,
   imageParseFilePipeInstance,
 } from 'src/helpers/multer.setup';
-import { HotelRoom } from './schemas/hotel-room.schema';
 import { ObjectId } from 'mongoose'; // Грязненько, конечно
-import { createHotelRoomValidationSchema } from './validation/create.hotel-room.validation.schema';
 import { ID } from 'src/types/id';
 import { getBooleanValue, getImagesPaths } from './hotels.utils';
+import { validateId } from 'src/helpers/idValidator';
 
 @Controller()
 export class HotelsController {
@@ -49,8 +48,8 @@ export class HotelsController {
 
   // Информация о конкретном номере
   @Get('common/hotel-rooms/:id')
-  getTargetRoom() {
-    return this.hotelsRoomsService.findById;
+  getTargetRoom(@Param('id') id: ID) {
+    return this.hotelsRoomsService.findById(validateId(id));
   }
 
   // Добавление гостиницы
@@ -69,14 +68,14 @@ export class HotelsController {
 
   // Изменение описания гостиницы
   @Put('admin/hotels/:id')
-  editHotel() {
+  editHotel(@Param('id') id: ID) {
     return this.hotelsService.update;
   }
 
   // Добавление номера
   @Post('admin/hotel-rooms')
   @UseGuards(AdminRoleGuard)
-  // @UsePipes(new ValidationPipe(createHotelRoomValidationSchema)) // TODO: Видимо из-за того, что формдата, ты не работаешь как надо
+  // @UsePipes(new ValidationPipe(createHotelRoomValidationSchema))
   @UseInterceptors(
     FilesInterceptor(FORM_FIELD_NAME, MAX_IMAGES_COUNT, filesInterceptorSetup),
   )
@@ -84,12 +83,9 @@ export class HotelsController {
     @UploadedFiles(imageParseFilePipeInstance) files: Express.Multer.File[],
     @Body() body: CreateHotelRoomDto,
   ) {
-    // mockHotelId - 641589634be330baf5eeca70
-    const images: HotelRoom['images'] = [''];
-    images.pop();
-    files.forEach((file) => images.push(`/img/${file.filename}`));
+    const images = getImagesPaths(files);
     return this.hotelsRoomsService.create({
-      hotel: body.hotelId as ObjectId, // Обманул...
+      hotel: validateId(body.hotelId) as ObjectId, // Обманул...
       description: body.description,
       images,
     });
@@ -98,7 +94,7 @@ export class HotelsController {
   // Изменение описания номера
   @Put('admin/hotel-rooms/:id')
   @UseGuards(AdminRoleGuard)
-  // @UsePipes(new ValidationPipe(createHotelRoomValidationSchema)) // TODO: Видимо из-за того, что формдата, ты не работаешь как надо
+  // @UsePipes(new ValidationPipe(createHotelRoomValidationSchema))
   @UseInterceptors(
     FilesInterceptor(FORM_FIELD_NAME, MAX_IMAGES_COUNT, filesInterceptorSetup),
   )
@@ -107,13 +103,12 @@ export class HotelsController {
     @Body() body: UpdateHotelRoomDto,
     @Param('id') id: ID,
   ) {
-    // mockHotelRoomId - 6419614269f934af13700cbd
     const isEnabled = getBooleanValue(body.isEnabled);
     const images = getImagesPaths(files);
-    return this.hotelsRoomsService.update(id, {
-      hotel: body.hotelId as unknown as ObjectId, // Ну совсем дичь какая-то...
+    return this.hotelsRoomsService.update(validateId(id), {
+      hotel: validateId(body.hotelId) as ObjectId, // Снова обманул... но лучше так не делать
       description: body.description,
-      isEnabled, // TODO: При валидации разрешить принимать только 2 значения строк, как ты сделал с ролями юзеров. И оно должно быть реквайред? Во всяком случае сыпанёт ошибку, если прилетит андефайн
+      isEnabled,
       images,
     });
   }
@@ -123,19 +118,8 @@ export class HotelsController {
   seeUploadedFile(@Param('imgpath') image, @Response() response) {
     const host = 'localhost';
     const port = '3000';
-    console.log(image); // vepCaCPa6-yfZH0kSDSxuquCseDo7Rgy6VsOU7g79U8-f361.png - имя файла в директории
-    // TODO: А как отдать сразу несколько?
-    // Что-то я подзабыл... вспомни, как в курсовой и библиотеке делал. Там вроде картинок не было... а когда фронтом был, как тебе картинки с бэка прилетали? Найди апишку базы...
-    // Там оттдается ссылочка вот такого вида: /uploads/2022/12/cover.jpg.43d63bc35e8a8ad8f8fd66cdfa4a97d49d334f020d6ad52884c7d8bbabf61457.jpeg - то есть хоста и порта нет, значит и мне нужно просто отдавать "/img/${image}", но ты это уточни на всякий случай
-    // Ссылки на паблик давать мне тут кажется плохой идеей. А "рут" надо в константу или енв
+    console.log(image);
     // return response.sendFile(image, { root: './files/img' }); // Можно вот так еще, но мне в данном случае такой способ не подходит
     return response.send(`${host}:${port}/img/${image}`);
   }
 }
-
-/*
-3 ближайшие квеста:
-1) Парсинг формдаты +
-2) Как отдать массив картинок +-
-3) Почему "файл из реквайред"? (нельзя не прикрепить картинку) В настройках малтера чтоли что-то? +
-*/
