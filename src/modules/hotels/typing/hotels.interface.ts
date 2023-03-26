@@ -5,12 +5,13 @@ import { Hotel } from '../schemas/hotel.schema';
 interface SearchHotelParams {
   limit: number;
   offset: number;
-  title: string;
+  title?: string; // Как-то нелогично, сделаю необязательным
 }
 
+// Ни одно из полей в данном случае не должно быть обязательным, по логике, поправил интерфейс
 interface UpdateHotelParams {
-  title: string;
-  description: string;
+  title?: string;
+  description?: string;
 }
 
 interface IHotelService {

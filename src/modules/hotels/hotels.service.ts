@@ -2,6 +2,7 @@
 import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
+import { DEFAULT_LIMIT, DEFAULT_OFFSET } from 'src/constants';
 import { ID } from 'src/types/id';
 import { Hotel, HotelDocument } from './schemas/hotel.schema';
 import { CreateHotelDto, IHotelService, SearchHotelParams, UpdateHotelParams } from './typing/hotels.interface';
@@ -24,11 +25,30 @@ export class HotelsService implements IHotelService {
   }
 
   async search(params: SearchHotelParams): Promise<Hotel[]> {
-    throw new Error('Method not implemented.');
+    const {
+      limit = DEFAULT_LIMIT,
+      offset = DEFAULT_OFFSET,
+    } = params;
+
+    return await this.HotelModel.find()
+      .limit(limit)
+      .skip(offset)
+      .select('id title description')
   }
-  
+
   async update(id: ID, data: UpdateHotelParams): Promise<Hotel> {
-    throw new Error('Method not implemented.');
+    // Тайтл и дескрипшн не достаю из даты, так как должна быть валидация, которая не пропустит лишнее или неподходящее
+    return await this.HotelModel.findByIdAndUpdate(
+      id,
+      {
+        ...data,
+        updatedAt: new Date().toISOString()
+      },
+      {
+        new: true
+      }
+    )
+    .select('id title description')
   }
-  
+
 }

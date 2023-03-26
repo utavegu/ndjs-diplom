@@ -20,6 +20,7 @@ import { HotelsService } from './hotels.service';
 import {
   CreateHotelDto,
   CreateHotelRoomDto,
+  UpdateHotelParams,
   UpdateHotelRoomDto,
 } from './typing/hotels.interface';
 import { createHotelValidationSchema } from './validation/create.hotel.validation.schema';
@@ -34,6 +35,7 @@ import { ObjectId } from 'mongoose'; // Грязненько, конечно
 import { ID } from 'src/types/id';
 import { getBooleanValue, getImagesPaths } from './hotels.utils';
 import { validateId } from 'src/helpers/idValidator';
+// import { updateHotelValidationSchema } from './validation/update.hotel.validation.schema';
 
 @Controller()
 export class HotelsController {
@@ -75,14 +77,17 @@ export class HotelsController {
 
   // Получение списка гостиниц
   @Get('admin/hotels')
-  getHotels() {
-    return this.hotelsService.search;
+  @UseGuards(AdminRoleGuard)
+  getHotels(@Query() { limit, offset }) {
+    return this.hotelsService.search({ limit, offset });
   }
 
   // Изменение описания гостиницы
   @Put('admin/hotels/:id')
-  editHotel(@Param('id') id: ID) {
-    return this.hotelsService.update;
+  @UseGuards(AdminRoleGuard)
+  // @UsePipes(new ValidationPipe(updateHotelValidationSchema)) // TODO: Лучше разобраться с валидацией и пайпами
+  editHotel(@Body() body: UpdateHotelParams, @Param('id') id: ID) {
+    return this.hotelsService.update(validateId(id), body);
   }
 
   // Добавление номера
