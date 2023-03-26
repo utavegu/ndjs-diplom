@@ -1,6 +1,7 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
+import { DEFAULT_LIMIT, DEFAULT_OFFSET } from 'src/constants';
 import { ID } from 'src/types/id';
 import { HotelRoom, HotelRoomDocument } from './schemas/hotel-room.schema';
 import { HotelRoomService, SearchRoomsParams } from './typing/hotels.interface';
@@ -31,7 +32,36 @@ export class HotelsRoomsService implements HotelRoomService {
   }
 
   async search(params: SearchRoomsParams): Promise<HotelRoom[]> {
-    throw new Error('Method not implemented.');
+    const {
+      limit = DEFAULT_LIMIT,
+      offset = DEFAULT_OFFSET,
+      hotel,
+      isEnabled,
+    } = params;
+
+    const searchFilters = {
+      hotel,
+      isEnabled,
+    };
+
+    // TODO: Вероятно стоит вынести в helpers - utils.ts, в юзер-сервисе ты используешь похожую штуку (эта правильнее)
+    for (const filter in searchFilters) {
+      if (
+        searchFilters[filter] === null ||
+        searchFilters[filter] === undefined
+      ) {
+        delete searchFilters[filter];
+      }
+    }
+
+    return await this.HotelRoomModel.find(searchFilters)
+      .limit(limit)
+      .skip(offset)
+      .select('-__v -createdAt -updatedAt -isEnabled')
+      .populate({
+        path: 'hotel',
+        select: 'id title',
+      });
   }
 
   async update(id: ID, data: Partial<HotelRoom>): Promise<HotelRoom> {

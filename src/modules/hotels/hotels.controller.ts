@@ -9,7 +9,9 @@ import {
   UseInterceptors,
   UploadedFiles,
   Param,
-  Response,
+  Query,
+  Request,
+  BadRequestException,
 } from '@nestjs/common';
 import { AdminRoleGuard } from 'src/helpers/guards/admin.role.guard';
 import { ValidationPipe } from 'src/helpers/validation.pipe';
@@ -41,9 +43,20 @@ export class HotelsController {
   ) {}
 
   // Поиск номеров
+  // TODO: После того как отрефакторишь авторизацию и переделаешь ее на локал стрэтеджи. Если пользователь не аутентифицирован или его роль client, то при поиске всегда должен использоваться флаг isEnabled: true
   @Get('common/hotel-rooms')
-  searchHotelRooms() {
-    return this.hotelsRoomsService.search;
+  // TODO: Валидация квери-параметров! Валидацию id, кстати, можно через пайп сделать... а как заставить джой валидировать не только боди, но и квери параметры, например? Всё это надо бы валидировать через пайп, исправь
+  searchHotelRooms(@Query() { limit, offset, hotel }, @Request() request) {
+    if (isNaN(limit) || isNaN(offset)) {
+      throw new BadRequestException('Ошибка в квери параметрах');
+    } else {
+      return this.hotelsRoomsService.search({
+        limit: Number(limit),
+        offset: Number(offset),
+        hotel: hotel && validateId(hotel),
+        isEnabled: false, // ТУТ БУДЕТ ТЕРНАРНИК (когда аутентификацию перепилишь)
+      });
+    }
   }
 
   // Информация о конкретном номере
@@ -114,6 +127,7 @@ export class HotelsController {
   }
 
   // Для тестирования загруженных файлов
+  /*
   @Get('test/getimage/:imgpath')
   seeUploadedFile(@Param('imgpath') image, @Response() response) {
     const host = 'localhost';
@@ -122,4 +136,5 @@ export class HotelsController {
     // return response.sendFile(image, { root: './files/img' }); // Можно вот так еще, но мне в данном случае такой способ не подходит
     return response.send(`${host}:${port}/img/${image}`);
   }
+  */
 }

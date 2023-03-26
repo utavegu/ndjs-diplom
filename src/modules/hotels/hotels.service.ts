@@ -20,7 +20,7 @@ export class HotelsService implements IHotelService {
   }
 
   async findById(id: ID): Promise<Hotel> {
-    throw new Error('Method not implemented.');
+    return await this.HotelModel.findById(id).select('-__v -createdAt -updatedAt');
   }
 
   async search(params: SearchHotelParams): Promise<Hotel[]> {
