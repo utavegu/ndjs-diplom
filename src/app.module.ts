@@ -9,6 +9,8 @@ import { SupportChatModule } from './modules/support-chat/support-chat.module';
 import { EventEmitterModule } from '@nestjs/event-emitter';
 import { HotelsModule } from './modules/hotels/hotels.module';
 import { ReservationModule } from './modules/reservation/reservation.module';
+import { ServeStaticModule } from '@nestjs/serve-static';
+import { join } from 'path';
 
 @Module({
   imports: [
@@ -24,6 +26,9 @@ import { ReservationModule } from './modules/reservation/reservation.module';
     EventEmitterModule.forRoot(),
     HotelsModule,
     ReservationModule,
+    ServeStaticModule.forRoot({
+      rootPath: join(__dirname, '..', 'client'),
+    }),
   ],
   controllers: [AppController],
   providers: [AppService],

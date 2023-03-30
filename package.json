@@ -28,6 +28,7 @@
     "@nestjs/passport": "^9.0.3",
     "@nestjs/platform-express": "^9.0.0",
     "@nestjs/platform-socket.io": "^9.3.9",
+    "@nestjs/serve-static": "^3.0.1",
     "@nestjs/websockets": "^9.3.9",
     "bcrypt": "^5.1.0",
     "express-session": "^1.17.3",

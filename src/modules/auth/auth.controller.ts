@@ -44,7 +44,12 @@ export class AuthController {
       name: user.name,
       role: user.role,
     });
-    response.cookie('token', token, { httpOnly: true }); // TODO: Или другое имя куки?
+    // eslint-disable-next-line prettier/prettier
+    response.cookie(
+      'token',
+      token,
+      // { httpOnly: true }, // По-взрослому эта строчка нужна, но через статику мешает мне тестить
+    ); // TODO: Или другое имя куки?
     return response.json({
       email: user.email,
       name: user.name,
@@ -55,11 +60,14 @@ export class AuthController {
   @Post('auth/logout')
   @UseGuards(JwtAuthGuard, LoginedUsersGuard)
   @HttpCode(HttpStatus.OK)
-  @Header('Authorization', '') // TODO: Не уверен, что это делается так
+  // @Header('Authorization', '') // TODO: Не уверен, что это делается так
   async logout(@Request() request, @Response() response): Promise<void> {
+    console.log('ДОСТУП ПОЛУЧЕН');
+    /*
     request.logout((err) => console.log(err)); // C JWT это бесполезная строчка, да?
     response.cookie('token', ''); // TODO: Не уверен, что это делается так
     // TODO: Попробуй понять что имел в виду Денис Владимиров на счёт флага
+    */
     return;
   }
 

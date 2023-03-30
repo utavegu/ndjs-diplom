@@ -1,0 +1,72 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport"
+    content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>Testing</title>
+</head>
+
+<body>
+  <form id="form">
+    <p>
+      <label for="username">email</label>
+      <input placeholder="username" type="text" id="username" name="email">
+    </p>
+    <p>
+      <label for="password">password</label>
+      <input placeholder="password" type="text" id="password" name="password">
+    </p>
+    <button type="submit" id="loginButton">Login</button>
+  </form>
+
+  <br>
+
+  <button id="logoutButton">Logout</button>
+
+  <hr>
+
+  <script>
+    const getCookie = (cookieName) => {
+      var matches = document.cookie.match(new RegExp(
+        "(?:^|; )" + cookieName.replace(/([\.$?*|{}\(\)\[\]\\\/\+^])/g, '\\$1') + "=([^;]*)"
+      ));
+      return matches ? decodeURIComponent(matches[1]) : undefined;
+    }
+
+    const form = document.querySelector("#form");
+    const loginButton = document.querySelector("#loginButton");
+    const logoutButton = document.querySelector("#logoutButton");
+
+    const loginHandler = async (event) => {
+      event.preventDefault();
+      await fetch('/api/auth/login', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json;charset=utf-8'
+        },
+        body: JSON.stringify({
+          email: form.email.value,
+          password: form.password.value,
+        })
+      });
+    }
+
+    const logoutHandler = async (event) => {
+      await fetch('/api/auth/logout', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json;charset=utf-8',
+          'Authorization': `Bearer ${getCookie('token')}`
+        },
+      });
+    }
+
+    loginButton.addEventListener('click', loginHandler)
+    logoutButton.addEventListener('click', logoutHandler)
+  </script>
+</body>
+
+</html>
