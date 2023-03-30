@@ -7,4 +7,5 @@ export const ERROR_MESSAGES = {
   ONLY_AVAILABLE_NON_AUTHENTICATED_USERS: 'Доступно только не аутентифицированным пользователям',
   ONLY_AVAILABLE_AUTHENTICATED_USERS: 'Доступно только аутентифицированным пользователям',
   INVALID_ID: 'Ошибка ввода ID!',
+  DO_NOT_ACCESS_RIGHTS: 'У вас недостаточно прав доступа!',
 };
