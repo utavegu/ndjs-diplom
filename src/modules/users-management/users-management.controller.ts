@@ -15,19 +15,23 @@ import { User } from '../users/schemas/user.schema';
 import { ISearchUserParams } from '../users/typing/interfaces/ISearchUserParams';
 // import { Role } from './role.decorator';
 // import { Roles } from '../users/typing/enums/roles.enum';
-import { AdminRoleGuard } from 'src/helpers/guards/admin.role.guard';
-import { ManagerRoleGuard } from 'src/helpers/guards/manager.role.guard';
 import { createUserValidationSchema } from '../users/create.user.validation.schema';
 import { UserDto } from '../users/typing/interfaces/user.dto';
 import { ValidationPipe } from 'src/helpers/validation.pipe';
 import { AdminReturnedUserType } from '../users/typing/types/returned-user.type';
+import { Role } from 'src/helpers/decorators/role.decorator';
+import { Roles } from '../users/typing/enums/roles.enum';
+import { JwtAuthGuard } from 'src/helpers/guards/jwt.auth.guard';
+import { LoginedUsersGuard } from 'src/helpers/guards/logined-users.guard';
+import { RoleGuard } from 'src/helpers/guards/role.guard';
 
 @Controller()
+@UseGuards(JwtAuthGuard, LoginedUsersGuard, RoleGuard)
 export class UsersManagementController {
   constructor(private readonly usersService: UsersService) {}
 
   @Post('admin/users')
-  @UseGuards(AdminRoleGuard)
+  @Role(Roles.ADMIN)
   @HttpCode(HttpStatus.CREATED) // TODO: Вообще он и сам правильно определяет код, так что в этом нет необходимости, по идее...
   @UsePipes(new ValidationPipe(createUserValidationSchema))
   async adminCreateUser(
@@ -38,8 +42,7 @@ export class UsersManagementController {
   }
 
   @Get('admin/users')
-  // @Role(Roles.ADMIN) // TODO: если сможешь починить эту штуку, по-хорошему гарду повесить на весь контроллер
-  @UseGuards(AdminRoleGuard)
+  @Role(Roles.ADMIN)
   @HttpCode(HttpStatus.OK)
   async fetchUsersForAdmin(
     @Query() queryParams: ISearchUserParams,
@@ -48,8 +51,7 @@ export class UsersManagementController {
   }
 
   @Get('manager/users')
-  // @Role(Roles.MANAGER)
-  @UseGuards(ManagerRoleGuard)
+  @Role(Roles.MANAGER)
   @HttpCode(HttpStatus.OK)
   async fetchUsersForManager(
     @Query() queryParams: ISearchUserParams,

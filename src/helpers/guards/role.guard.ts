@@ -20,7 +20,10 @@ export class RoleGuard implements CanActivate {
     if (user.role === admissionRole) {
       return true;
     } else {
-      throw new ForbiddenException(ERROR_MESSAGES.DO_NOT_ACCESS_RIGHTS);
+      throw new ForbiddenException(
+        `${user.role}! ${ERROR_MESSAGES.DO_NOT_ACCESS_RIGHTS}`,
+        // TODO: Тут для красоты можно словарик сделать, чтобы не admin, а Администратор, например. Только пусть будет с маленькой буквы, будешь еще делать капитализ/апперкейс
+      );
     }
   }
 }

@@ -13,7 +13,6 @@ import {
   Request,
   BadRequestException,
 } from '@nestjs/common';
-import { AdminRoleGuard } from 'src/helpers/guards/admin.role.guard';
 import { ValidationPipe } from 'src/helpers/validation.pipe';
 import { HotelsRoomsService } from './hotels-rooms.service';
 import { HotelsService } from './hotels.service';
@@ -35,6 +34,11 @@ import { ObjectId } from 'mongoose'; // Грязненько, конечно
 import { ID } from 'src/types/id';
 import { getBooleanValue, getImagesPaths } from './hotels.utils';
 import { validateId } from 'src/helpers/idValidator';
+import { Role } from 'src/helpers/decorators/role.decorator';
+import { Roles } from '../users/typing/enums/roles.enum';
+import { JwtAuthGuard } from 'src/helpers/guards/jwt.auth.guard';
+import { LoginedUsersGuard } from 'src/helpers/guards/logined-users.guard';
+import { RoleGuard } from 'src/helpers/guards/role.guard';
 // import { updateHotelValidationSchema } from './validation/update.hotel.validation.schema';
 
 @Controller()
@@ -45,18 +49,19 @@ export class HotelsController {
   ) {}
 
   // Поиск номеров
-  // TODO: После того как отрефакторишь авторизацию и переделаешь ее на локал стрэтеджи. Если пользователь не аутентифицирован или его роль client, то при поиске всегда должен использоваться флаг isEnabled: true
   @Get('common/hotel-rooms')
+  @UseGuards(JwtAuthGuard)
   // TODO: Валидация квери-параметров! Валидацию id, кстати, можно через пайп сделать... а как заставить джой валидировать не только боди, но и квери параметры, например? Всё это надо бы валидировать через пайп, исправь
   searchHotelRooms(@Query() { limit, offset, hotel }, @Request() request) {
     if (isNaN(limit) || isNaN(offset)) {
+      // классно, только я тут не учитываю, что это вроде необязательные поля...
       throw new BadRequestException('Ошибка в квери параметрах');
     } else {
       return this.hotelsRoomsService.search({
         limit: Number(limit),
         offset: Number(offset),
         hotel: hotel && validateId(hotel),
-        isEnabled: false, // ТУТ БУДЕТ ТЕРНАРНИК (когда аутентификацию перепилишь)
+        isEnabled: request.user === false || request.user.role === Roles.CLIENT,
       });
     }
   }
@@ -69,7 +74,8 @@ export class HotelsController {
 
   // Добавление гостиницы
   @Post('admin/hotels')
-  @UseGuards(AdminRoleGuard)
+  @Role(Roles.ADMIN)
+  @UseGuards(JwtAuthGuard, LoginedUsersGuard, RoleGuard)
   @UsePipes(new ValidationPipe(createHotelValidationSchema))
   addHotel(@Body() body: CreateHotelDto) {
     return this.hotelsService.create(body);
@@ -77,14 +83,16 @@ export class HotelsController {
 
   // Получение списка гостиниц
   @Get('admin/hotels')
-  @UseGuards(AdminRoleGuard)
+  @Role(Roles.ADMIN)
+  @UseGuards(JwtAuthGuard, LoginedUsersGuard, RoleGuard)
   getHotels(@Query() { limit, offset }) {
     return this.hotelsService.search({ limit, offset });
   }
 
   // Изменение описания гостиницы
   @Put('admin/hotels/:id')
-  @UseGuards(AdminRoleGuard)
+  @Role(Roles.ADMIN)
+  @UseGuards(JwtAuthGuard, LoginedUsersGuard, RoleGuard)
   // @UsePipes(new ValidationPipe(updateHotelValidationSchema)) // TODO: Лучше разобраться с валидацией и пайпами
   editHotel(@Body() body: UpdateHotelParams, @Param('id') id: ID) {
     return this.hotelsService.update(validateId(id), body);
@@ -92,7 +100,8 @@ export class HotelsController {
 
   // Добавление номера
   @Post('admin/hotel-rooms')
-  @UseGuards(AdminRoleGuard)
+  @Role(Roles.ADMIN)
+  @UseGuards(JwtAuthGuard, LoginedUsersGuard, RoleGuard)
   // @UsePipes(new ValidationPipe(createHotelRoomValidationSchema))
   @UseInterceptors(
     FilesInterceptor(FORM_FIELD_NAME, MAX_IMAGES_COUNT, filesInterceptorSetup),
@@ -111,7 +120,8 @@ export class HotelsController {
 
   // Изменение описания номера
   @Put('admin/hotel-rooms/:id')
-  @UseGuards(AdminRoleGuard)
+  @Role(Roles.ADMIN)
+  @UseGuards(JwtAuthGuard, LoginedUsersGuard, RoleGuard)
   // @UsePipes(new ValidationPipe(createHotelRoomValidationSchema))
   @UseInterceptors(
     FilesInterceptor(FORM_FIELD_NAME, MAX_IMAGES_COUNT, filesInterceptorSetup),

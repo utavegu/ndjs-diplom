@@ -13,11 +13,14 @@ import {
 import { SupportRequestService } from './support-request.service';
 import { SupportRequestClientService } from './support-request-client.service';
 import { SupportRequestEmployeeService } from './support-request-employee.service';
-import { ClientRoleGuard } from 'src/helpers/guards/client.role.guard';
-import { ManagerRoleGuard } from 'src/helpers/guards/manager.role.guard';
 import { ChatRoleGuard } from 'src/helpers/guards/chat.role.guard';
 import { CreateSupportRequestDto } from './typing/interfaces/support-chat.interface';
 import { ID } from 'src/types/id';
+import { Roles } from '../users/typing/enums/roles.enum';
+import { Role } from 'src/helpers/decorators/role.decorator';
+import { JwtAuthGuard } from 'src/helpers/guards/jwt.auth.guard';
+import { LoginedUsersGuard } from 'src/helpers/guards/logined-users.guard';
+import { RoleGuard } from 'src/helpers/guards/role.guard';
 
 @Controller()
 export class SupportChatController {
@@ -29,7 +32,8 @@ export class SupportChatController {
 
   // Позволяет пользователю с ролью client создать обращение в техподдержку
   @Post('client/support-requests')
-  @UseGuards(ClientRoleGuard)
+  @Role(Roles.CLIENT)
+  @UseGuards(JwtAuthGuard, LoginedUsersGuard, RoleGuard)
   @HttpCode(HttpStatus.OK)
   async createClientMessage(
     @Body('text') text: CreateSupportRequestDto['text'],
@@ -43,7 +47,8 @@ export class SupportChatController {
 
   // Позволяет пользователю с ролью client получить список обращений для текущего пользователя.
   @Get('client/support-requests')
-  @UseGuards(ClientRoleGuard)
+  @Role(Roles.CLIENT)
+  @UseGuards(JwtAuthGuard, LoginedUsersGuard, RoleGuard)
   @HttpCode(HttpStatus.OK)
   async clientFetchAllAppeals(@Request() request, @Query() query) {
     return await this.supportRequestService.findSupportRequests({
@@ -56,7 +61,8 @@ export class SupportChatController {
 
   // Позволяет пользователю с ролью manager получить список обращений от клиентов.
   @Get('manager/support-requests')
-  @UseGuards(ManagerRoleGuard)
+  @Role(Roles.MANAGER)
+  @UseGuards(JwtAuthGuard, LoginedUsersGuard, RoleGuard)
   @HttpCode(HttpStatus.OK)
   async managerFetchAllAppeals(@Request() request, @Query() query) {
     return await this.supportRequestService.findSupportRequests({
