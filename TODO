@@ -27,7 +27,7 @@ docker-compose -f docker-compose.dev.yml up
 
 Фильтры и валидаторы - это вот не они ли хэлперс? (пока да, но лучше уточнить этот момент)
 
-Инструкцию к АПИ или даже Сваггер обкатать
+Инструкцию к АПИ или даже Сваггер обкатать - @nestjs/swagger
 
 Рефактор: директория сетап/конфиг с настройками проекта.
 
@@ -100,9 +100,34 @@ https://www.npmjs.com/package/sharp
 
 Почитай чего написал в jwt.auth.guard.ts и подумай как это улучшить, задай вопрос дипруку. Но сделаешь это после тестирования всей API
 
-Вероятно, директория helpers должна выглядеть несколько иначе, уточни у Артема Ч. Никита говорит, что это то же самое что утилс, нечто, что может быть использовано в сервисах. А всех остальных ребят по их директориям выноси на один уровнь с модулями (РЕФАКТОР)
+Вероятно, директория helpers должна выглядеть несколько иначе, уточни у Артема Ч. Никита говорит, что это то же самое что утилс, нечто, что может быть использовано в сервисах. А всех остальных ребят по их директориям выноси на один уровнь с модулями (РЕФАКТОР). Гарды в модуль авторизации, так как они имеют отношение только к нему
 
 pubic/client/index:
 1) Авторизация и токен
 2) Вебсокеты
 3) Формдата и файл
+
+лишние трайкэтчи? Проэкспериментируй на каком-нибудь сервисе
+
+ConfigureService из @nestjs/config прикрути ближайшее время.
+
+После реализации аутентификации через куки и логина такая вот ошибка, при этом приложение не валится:
+[Nest] 289  - 04/06/2023, 11:19:46 AM   ERROR [ExceptionsHandler] Converting circular structure to JSON
+aggregator-app     |     --> starting at object with constructor 'Socket'
+aggregator-app     |     |     property '_writableState' -> object with constructor 'WritableState'
+aggregator-app     |     |     property 'afterWriteTickInfo' -> object with constructor 'Object'
+aggregator-app     |     --- property 'stream' closes the circle
+aggregator-app     | TypeError: Converting circular structure to JSON
+aggregator-app     |     --> starting at object with constructor 'Socket'
+aggregator-app     |     |     property '_writableState' -> object with constructor 'WritableState'
+aggregator-app     |     |     property 'afterWriteTickInfo' -> object with constructor 'Object'
+aggregator-app     |     --- property 'stream' closes the circle
+aggregator-app     |     at JSON.stringify (<anonymous>)
+aggregator-app     |     at stringify (/app/node_modules/express/lib/response.js:1150:12)
+aggregator-app     |     at ServerResponse.json (/app/node_modules/express/lib/response.js:271:14)
+aggregator-app     |     at ExpressAdapter.reply (/app/node_modules/@nestjs/platform-express/adapters/express-adapter.js:61:62)
+aggregator-app     |     at RouterResponseController.apply (/app/node_modules/@nestjs/core/router/router-response-controller.js:15:36)
+aggregator-app     |     at /app/node_modules/@nestjs/core/router/router-execution-context.js:176:48
+aggregator-app     |     at processTicksAndRejections (node:internal/process/task_queues:95:5)
+aggregator-app     |     at /app/node_modules/@nestjs/core/router/router-execution-context.js:47:13
+aggregator-app     |     at /app/node_modules/@nestjs/core/router/router-proxy.js:9:17

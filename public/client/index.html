@@ -10,6 +10,8 @@
 </head>
 
 <body>
+  <h1>Тестирование</h1>
+  <h2>Авторизации</h2>
   <form id="form">
     <p>
       <label for="username">email</label>
@@ -28,8 +30,15 @@
 
   <hr>
 
+  <h2>Веб-сокетов</h2>
+
+  <hr>
+
+  <h2>Загрузки изображений</h2>
+
   <script>
     const getCookie = (cookieName) => {
+      // фиговая практика с точки зрения безопасности, надо как-то делать с httpOnly... Собственно в обход заголовков, на сервере работать только с куки (реализовал)
       var matches = document.cookie.match(new RegExp(
         "(?:^|; )" + cookieName.replace(/([\.$?*|{}\(\)\[\]\\\/\+^])/g, '\\$1') + "=([^;]*)"
       ));
@@ -59,7 +68,7 @@
         method: 'POST',
         headers: {
           'Content-Type': 'application/json;charset=utf-8',
-          'Authorization': `Bearer ${getCookie('token')}`
+          // 'Authorization': `Bearer ${getCookie('token')}` // Вариант для авторизации через токен. Оставляю, чтобы не забыть, но так как он менее безопасный, использую вариант через куки
         },
       });
     }

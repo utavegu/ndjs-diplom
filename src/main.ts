@@ -6,14 +6,15 @@ import * as session from 'express-session'; // Почитай документа
 import * as passport from 'passport';
 import { ExtendedException } from './helpers/exception.filter';
 import { resolve } from 'path';
+import * as cookieParser from 'cookie-parser';
 
 async function bootstrap() {
   const app = await NestFactory.create<NestExpressApplication>(AppModule);
 
   app
-    // .use(cookieParser()) // TODO: Вероятно понадобится после прикручивания фронта
+    .use(cookieParser())
     .setGlobalPrefix('api')
-    .useStaticAssets(resolve(__dirname, "../public")) // Ещё потом статику туда сунешь для теста сокетов и авторизации, не забудь установить пакет @nestjs/serve-static
+    .useStaticAssets(resolve(__dirname, "../public"))
     .useGlobalFilters(new ExtendedException())
     .use(session({
       secret: 'z73Sah701Jaxf3', // В ЕНВ
