@@ -7,10 +7,7 @@ import {
   HttpStatus,
   UsePipes,
   UseGuards,
-  Request,
   Response,
-  Header,
-  BadRequestException,
 } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { UsersService } from '../users/users.service';
@@ -20,23 +17,32 @@ import { ValidationPipe } from 'src/helpers/validation.pipe';
 import { JwtAuthGuard } from 'src/helpers/guards/jwt.auth.guard';
 import { createUserValidationSchema } from '../users/create.user.validation.schema';
 import { ClientReturnedUserType } from '../users/typing/types/returned-user.type';
-import { ERROR_MESSAGES } from 'src/constants';
 import { OnlyGuestGuard } from 'src/helpers/guards/only-guest.guard';
 import { LoginedUsersGuard } from 'src/helpers/guards/logined-users.guard';
-import { CookieOptions, Request as RequestType, Response as ResponseType } from 'express';
+import { CookieOptions, Response as ResponseType } from 'express';
 
-  // TODO: ДОДЕЛАТЬ
-  // А, ну вот тут собственно можно посмотреть, как это делается средстами Экспресса: https://expressjs.com/ru/api.html#res.cookie
-const setCookieOptions: CookieOptions = {
-  // По-взрослому эта строчка нужна, но через статику мешает мне тестить (не доступны из JavaScript через свойства Document.cookie)
+// TODO: Этих двух ребят куда-нибудь в конфигурационный файл
+
+// https://expressjs.com/ru/api.html#res.cookie
+const cookieOptions: CookieOptions = {
+  // Недоступны из JavaScript через свойства document.cookie
   httpOnly: true,
-  // С атрибутом Strict куки будут отправляться только тому сайту, которому эти куки принадлежат.
-  sameSite: 'strict', 
-  // Отсылаются на сервер только по протоколу SSL или HTTPS, за правильность написания не уверен
+  // С атрибутом Strict куки будут отправляться только тому сайту, которому эти куки принадлежат. Задача - для защиты от CSRF аттак, запретит передачу Cookie файлов если переход к вашему API был не с установленого в Cookie домена
+  sameSite: 'strict',
+  // Срок действия куки (на лёрнджээс почему-то пишут, что в секундах, но тут работает в миллисекундах)
+  maxAge: 30 * 1000, // такое же как и протухание токена, ЕНВ
+  // Отсылаются на сервер только по протоколу SSL или HTTPS. Важный параметр для прода!
   // secure: true,
-  // те URL-адреса, к которым куки будут отсылаться. По умолчанию куки доступны лишь тому домену, который его установил и не передаются поддомену. Потому лучше оставить по-умолчанию (если укажу как у меня тут ниже, то еще и поддомены будут доступны)
+  // те URL-адреса, к которым куки будут отсылаться. По умолчанию куки доступны лишь тому домену, который его установил и не передаются поддомену. Потому лучше оставить по-умолчанию (если укажу как у меня тут ниже, то еще и поддомены будут доступны). При необходимости есть ещё path. Задача - чтобы избежать оверхеда при запросах к статичным файлам (публичным картинкам/стилям/js файлам)
   // domain: 'localhost:3000',
-  // expires: до того же времени, что и токен
+}
+
+const responseHeaders = {
+  // TODO: не уверен, что правильно установил (спроси у проверяющего). И самостоятельно поразбирайся в теме установки заголовков. Только ли на эту ручку надо весить, на другие тоже или вообще на уровне настройки сервера (Nginx, Apache)
+  'Content-Security-Policy': 'default-src self', // ограничение доверенных доменов для предотвращения возможных XSS атак (вот тут довольно подробно о нем - https://blog.skillfactory.ru/glossary/csp/)
+  'X-Frame-Options': 'SAMEORIGIN', // для защиты от атак типа clickjacking
+  'X-XSS-Protection': '1; mode=block', // принудительно включить встроенный механизм защиты браузера от XSS атак
+  'X-Content-Type-Options': 'nosniff', // для защиты от подмены MIME типов
 }
 
 @Controller()
@@ -49,60 +55,48 @@ export class AuthController {
   @Post('auth/login')
   @UseGuards(JwtAuthGuard, OnlyGuestGuard)
   @HttpCode(HttpStatus.OK)
-  // @Header([('Cache-Control', 'none'), ('Cache-Control', 'none')]) -- СКОРЕЕ ВСЕГО УДОБНЕЕ БУДЕТ ЭТО СДЕЛАТЬ ЧЕРЕЗ РЕСПОНС, КАК И КУКИ, РАЗ УЖ ТЫ ИСПОЛЬЗУЕШЬ РЕСПОНС ТУТ. response.append для этого используется https://expressjs.com/ru/api.html#res.append
   async login(
     @Body() body: Omit<UserDto, 'name' | 'contactPhone' | 'role'>,
-    @Response(
-      // { passthrough: true }
-    ) response: ResponseType & User,
+    @Response({ passthrough: true }) response: ResponseType & User,
   ): Promise<User | string> {
     const user = await this.authService.login(body);
-    // TODO: Далее сильно не уверен в правильности исполнения
     const token = this.authService.createToken({
       sub: user.email,
       name: user.name,
       role: user.role,
-    });
-    // eslint-disable-next-line prettier/prettier
-    response.cookie(
-      'token', // TODO: Или другое имя куки? Есть ли договоренности на этот счёт?
-      token,
-      setCookieOptions,
-    );
-    // response.headers('Cache-Control', 'none') --- чот заругался на такое
-    return response.json({
-      email: user.email,
-      name: user.name,
-      contactPhone: user.contactPhone,
-    });
+    });      
+    return response
+      .cookie(
+        'token', // TODO: Или другое имя куки? Есть ли договоренности на этот счёт?
+        token,
+        cookieOptions,
+      )
+      .set(responseHeaders)
+      .json({
+        email: user.email,
+        name: user.name,
+        contactPhone: user.contactPhone,
+      });
   }
 
   @Post('auth/logout')
   @UseGuards(JwtAuthGuard, LoginedUsersGuard)
   @HttpCode(HttpStatus.OK)
   async logout(
-    @Request() request: RequestType,
     @Response({ passthrough: true }) response: ResponseType
   ): Promise<void> {
     response.cookie('token', '', { expires: new Date() });
-    // response.clearCookie('token'); Или вот так еще можно, но тут протухание токена не установить
+    // response.clearCookie('token'); Или вот так еще можно, но тут протухание токена не установить. В нем есть какой-то смысл?
     return response.send('Разлогинились успешно!') as unknown as void; // TODO: Как вернуть пустой респонс?
-    // TODO: Попробуй понять что имел в виду Денис Владимиров на счёт флага. Вроде уже не надо
   }
 
   @Post('client/register')
+  @UseGuards(JwtAuthGuard, OnlyGuestGuard)
   @HttpCode(HttpStatus.CREATED)
   @UsePipes(new ValidationPipe(createUserValidationSchema))
   async create(
-    @Body() body: Omit<UserDto, 'role'>,
-    @Request() request,
+    @Body() body: Omit<UserDto, 'role'>
   ): Promise<ClientReturnedUserType> {
-    if (request.isUnauthenticated()) {
-      return await this.usersService.create(body);
-    } else {
-      throw new BadRequestException(
-        ERROR_MESSAGES.ONLY_AVAILABLE_NON_AUTHENTICATED_USERS,
-      );
-    }
+    return await this.usersService.create(body);
   }
 }

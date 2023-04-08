@@ -25,7 +25,8 @@ export class AuthService {
   }) {
     const fullPayload = {
       ...payload,
-      iat: Date.now(),
+      // TODO: С полями, которые принято передавать в пэйлоад JWT-токена поразбирайся уже после диплома
+      // iat: Date.now(), // Вот из-за этого поля токен протухать перестал, видимо неправильно настроил
       // exp: '120s', // TODO: env. И не уверен, что именно в таком формате это делается тут... Да, по хорошему должно быть в Unix Time (iat + exp)
     };
     return this.jwtService.sign(fullPayload);

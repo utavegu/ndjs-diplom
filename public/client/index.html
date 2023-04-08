@@ -15,11 +15,12 @@
   <form id="form">
     <p>
       <label for="username">email</label>
-      <input placeholder="username" type="text" id="username" name="email">
+      <!-- Так, а реквайред-то не работает разве, если я делаю превент дефолт? -->
+      <input placeholder="username" type="text" id="username" name="email" required>
     </p>
     <p>
       <label for="password">password</label>
-      <input placeholder="password" type="text" id="password" name="password">
+      <input placeholder="password" type="password" id="password" name="password" required>
     </p>
     <button type="submit" id="loginButton">Login</button>
   </form>
