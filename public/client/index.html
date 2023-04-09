@@ -33,10 +33,17 @@
 
   <h2>Веб-сокетов</h2>
 
+  <textarea id="messageArea" resize="none" required style="resize: none;"></textarea>
+
+  <button id="sendMessageButton">Отправить сообщение</button>
+  
+  <div id="messageScreen" style="width: 300px; height: 100px; border: 1px solid #000; margin: 10px 0 0; padding: 5px; box-sizing: border-box;"></div>
+
   <hr>
 
   <h2>Загрузки изображений</h2>
 
+  <script src="http://localhost:3000/socket.io/socket.io.js"></script>
   <script>
     const getCookie = (cookieName) => {
       // фиговая практика с точки зрения безопасности, надо как-то делать с httpOnly... Собственно в обход заголовков, на сервере работать только с куки (реализовал)
@@ -76,6 +83,26 @@
 
     loginButton.addEventListener('click', loginHandler)
     logoutButton.addEventListener('click', logoutHandler)
+
+    // --------------------------------------------------
+
+    const socket = io.connect('http://localhost:3000');
+
+    const messageArea = document.querySelector("#messageArea");
+    const sendMessageButton = document.querySelector("#sendMessageButton");
+    const messageScreen = document.querySelector("#messageScreen")
+
+    const chatHandler = () => {
+      socket.emit('message-from-client', messageArea.value);
+      messageArea.value = '';
+    }
+
+    socket.on('ws-server-response', (answer) => {
+      messageScreen.textContent = answer;
+    })
+
+    sendMessageButton.addEventListener('click', chatHandler)
+
   </script>
 </body>
 

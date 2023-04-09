@@ -13,7 +13,6 @@ import { SupportRequestService } from './support-request.service';
 
 import { EventEmitter2, OnEvent } from '@nestjs/event-emitter';
 import { Request, UseGuards } from '@nestjs/common';
-import { GatewayGuard } from 'src/helpers/guards/gateway.guard';
 
 // message: subscribeToChat payload: chatId - Позволяет пользователю с ролью manager или client получать новые сообщения в чате через WebSocket.
 
@@ -56,4 +55,20 @@ export class SupportChatGateway {
 
   }
 
+  @SubscribeMessage('message-from-client')
+  // @UseGuards(ВебсокетнаяГарда)
+  async addComment(@MessageBody() body): Promise<WsResponse> {
+    return {
+      event: 'ws-server-response',
+      data: 'Вы ввели: ' + body,
+    }
+  }
+
 }
+
+/*
+ПЛАН:
+- Авторизация и гарда (гугли на тему аутентификации при работе с вебсокетами)
+- Устранение ошибки текущей аутентификации
+- Пайпы (валидация), эксепшены и тд. Перечитай теорию 
+*/
