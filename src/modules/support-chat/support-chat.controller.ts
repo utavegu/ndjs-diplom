@@ -13,14 +13,14 @@ import {
 import { SupportRequestService } from './support-request.service';
 import { SupportRequestClientService } from './support-request-client.service';
 import { SupportRequestEmployeeService } from './support-request-employee.service';
-import { ChatRoleGuard } from 'src/helpers/guards/chat.role.guard';
+import { ChatRoleGuard } from 'src/modules/auth/guards/chat.role.guard';
 import { CreateSupportRequestDto } from './typing/interfaces/support-chat.interface';
 import { ID } from 'src/types/id';
 import { Roles } from '../users/typing/enums/roles.enum';
 import { Role } from 'src/helpers/decorators/role.decorator';
-import { JwtAuthGuard } from 'src/helpers/guards/jwt.auth.guard';
-import { LoginedUsersGuard } from 'src/helpers/guards/logined-users.guard';
-import { RoleGuard } from 'src/helpers/guards/role.guard';
+import { JwtAuthGuard } from 'src/modules/auth/guards/jwt.auth.guard';
+import { LoginedUsersGuard } from 'src/modules/auth/guards/logined-users.guard';
+import { RoleGuard } from 'src/modules/auth/guards/role.guard';
 
 @Controller()
 export class SupportChatController {

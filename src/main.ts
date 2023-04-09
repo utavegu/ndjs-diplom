@@ -3,24 +3,30 @@ import { NestFactory } from '@nestjs/core';
 import { NestExpressApplication } from "@nestjs/platform-express";
 import { AppModule } from './app.module';
 import * as session from 'express-session';
-// import * as passport from 'passport';
+import * as passport from 'passport';
 import { ExtendedException } from './helpers/exception.filter';
 import { resolve } from 'path';
-import * as cookieParser from 'cookie-parser';
+import * as cookieParser from 'cookie-parser'; // Куда куки парсер опять пропал с типами? И почему ты вообще работаешь, если пакет не установлен?
 
 async function bootstrap() {
   const app = await NestFactory.create<NestExpressApplication>(AppModule);
+
+  // TODO: Почитай документацию на счет того, что это невзрослый подход, не продакшен - https://docs.nestjs.com/techniques/session
+  /*
+  const sessionConfig = { 
+    secret: 'z73Sah701Jaxf3', // В ЕНВ (и порты-хосты тоже)
+    resave: false,
+    saveUninitialized: false,
+  }
+  */
 
   app
     .use(cookieParser())
     .setGlobalPrefix('api')
     .useStaticAssets(resolve(__dirname, "../public"))
     .useGlobalFilters(new ExtendedException())
-    .use(session({ // TODO: Почитай документацию на счет того, что это невзрослый подход, не продакшен - https://docs.nestjs.com/techniques/session
-      secret: 'z73Sah701Jaxf3', // В ЕНВ (и порты-хосты тоже)
-      resave: false,
-      saveUninitialized: false,
-    }))
+    // Вот это поворот. В какой момент стало работать без вас?
+    // .use(session(sessionConfig))
     // Лишнее вроде, но еще поэкспериментирую:
     // .use(passport.initialize())
     // .use(passport.session())

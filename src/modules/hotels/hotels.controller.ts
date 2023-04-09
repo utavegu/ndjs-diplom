@@ -36,9 +36,9 @@ import { getBooleanValue, getImagesPaths } from './hotels.utils';
 import { validateId } from 'src/helpers/idValidator';
 import { Role } from 'src/helpers/decorators/role.decorator';
 import { Roles } from '../users/typing/enums/roles.enum';
-import { JwtAuthGuard } from 'src/helpers/guards/jwt.auth.guard';
-import { LoginedUsersGuard } from 'src/helpers/guards/logined-users.guard';
-import { RoleGuard } from 'src/helpers/guards/role.guard';
+import { JwtAuthGuard } from 'src/modules/auth/guards/jwt.auth.guard';
+import { LoginedUsersGuard } from 'src/modules/auth/guards/logined-users.guard';
+import { RoleGuard } from 'src/modules/auth/guards/role.guard';
 // import { updateHotelValidationSchema } from './validation/update.hotel.validation.schema';
 
 @Controller()

@@ -14,11 +14,11 @@ import { UsersService } from '../users/users.service';
 import { User } from '../users/schemas/user.schema';
 import { UserDto } from '../users/typing/interfaces/user.dto';
 import { ValidationPipe } from 'src/helpers/validation.pipe';
-import { JwtAuthGuard } from 'src/helpers/guards/jwt.auth.guard';
+import { JwtAuthGuard } from 'src/modules/auth/guards/jwt.auth.guard';
 import { createUserValidationSchema } from '../users/create.user.validation.schema';
 import { ClientReturnedUserType } from '../users/typing/types/returned-user.type';
-import { OnlyGuestGuard } from 'src/helpers/guards/only-guest.guard';
-import { LoginedUsersGuard } from 'src/helpers/guards/logined-users.guard';
+import { OnlyGuestGuard } from 'src/modules/auth/guards/only-guest.guard';
+import { LoginedUsersGuard } from 'src/modules/auth/guards/logined-users.guard';
 import { CookieOptions, Response as ResponseType } from 'express';
 
 // TODO: Этих двух ребят куда-нибудь в конфигурационный файл

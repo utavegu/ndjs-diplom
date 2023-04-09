@@ -7,6 +7,13 @@ import {
 import { Reflector } from '@nestjs/core';
 import { ERROR_MESSAGES } from 'src/constants';
 
+/*
+TODO: Если получится извлекать юзера в вебсокетной гарде, то нужно будет переделать:
+- Определение контекста
+- Несколько ролей
+- Переименовать файл
+*/
+
 @Injectable()
 export class RoleGuard implements CanActivate {
   constructor(private reflector: Reflector) {}

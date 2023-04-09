@@ -4,6 +4,8 @@ import { Request } from 'express';
 // import { IUser } from 'src/modules/users/types/i-user';
 // import { ERRORS_USER } from 'src/modules/users/users.constants';
 
+// TODO: Не работает
+
 @Injectable()
 export class GatewayGuard implements CanActivate {
   async canActivate(context: ExecutionContext) {

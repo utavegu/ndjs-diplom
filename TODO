@@ -1,3 +1,10 @@
+1) ИвентЭмиттер в сокетах
+2) Конфиг (хотя это лучше когда енв уже пробрасывать будешь)
+3) Добить АПИ резерваций
+4) Аутентификация в сокетах
+5) Рефактор по тудусам
+
+
 docker-compose -f docker-compose.dev.yml up
 (тоже в ридми)
 
@@ -112,6 +119,7 @@ pubic/client/index:
 ConfigureService из @nestjs/config прикрути ближайшее время.
 
 ПОХОЖЕ С ЭТОЙ ОШИБКОЙ НУЖНО РАЗОБРАТЬСЯ, ВОЗМОЖНО В НЕЙ КОРЕНЬ ПРОБЛЕМЫ
+Возможно тут решение: https://stackoverflow.com/questions/64735881/typeerror-converting-circular-structure-to-json-starting-at-object-with-con
 После реализации аутентификации через куки и логина такая вот ошибка, при этом приложение не валится:
 [Nest] 289  - 04/06/2023, 11:19:46 AM   ERROR [ExceptionsHandler] Converting circular structure to JSON
 aggregator-app     |     --> starting at object with constructor 'Socket'

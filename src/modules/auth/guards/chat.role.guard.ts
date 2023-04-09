@@ -6,7 +6,7 @@ import {
 } from '@nestjs/common';
 import { Reflector } from '@nestjs/core';
 import { AuthGuard } from '@nestjs/passport';
-import { Roles } from '../../modules/users/typing/enums/roles.enum';
+import { Roles } from '../../users/typing/enums/roles.enum';
 
 @Injectable()
 export class ChatRoleGuard extends AuthGuard('jwt') {
