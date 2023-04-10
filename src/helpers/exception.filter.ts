@@ -11,7 +11,7 @@ import { Statuses } from '../modules/users/typing/enums/statuses.enum';
 @Catch(HttpException)
 export class ExtendedException implements ExceptionFilter {
   catch(exception: HttpException, host: ArgumentsHost) {
-    const ctx = host.switchToHttp();
+    const ctx = host.switchToHttp(); // TODO: Тут для вебсокетов нужно будет сделать определялку контекста и кондишн
     const response = ctx.getResponse<Response>();
     const request = ctx.getRequest<Request>();
     const errorCode = exception.getStatus();
