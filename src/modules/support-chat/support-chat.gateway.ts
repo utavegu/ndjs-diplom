@@ -13,6 +13,8 @@ import { SupportRequestService } from './support-request.service';
 
 import { EventEmitter2, OnEvent } from '@nestjs/event-emitter';
 import { Request, UseGuards } from '@nestjs/common';
+import { WsAuthenticatedGuard } from '../auth/guards/ws-authenticated.guard';
+import { JwtAuthGuard } from '../auth/guards/jwt.auth.guard';
 
 // message: subscribeToChat payload: chatId - Позволяет пользователю с ролью manager или client получать новые сообщения в чате через WebSocket.
 
@@ -55,9 +57,10 @@ export class SupportChatGateway {
 
   }
 
+  @UseGuards(JwtAuthGuard, WsAuthenticatedGuard)
   @SubscribeMessage('message-from-client')
-  // @UseGuards(ВебсокетнаяГарда)
   async addComment(@MessageBody() body): Promise<WsResponse> {
+    console.log('ГАРДА ПРОПУСТИЛА!');
     return {
       event: 'ws-server-response',
       data: 'Вы ввели: ' + body,
@@ -68,7 +71,8 @@ export class SupportChatGateway {
 
 /*
 ПЛАН:
-- Авторизация и гарда (гугли на тему аутентификации при работе с вебсокетами)
+- Ивент эммиттер
+- Пайпы (валидация), эксепшены и тд. Перечитай теорию
 - Устранение ошибки текущей аутентификации
-- Пайпы (валидация), эксепшены и тд. Перечитай теорию 
+- Авторизация и гарда (гугли на тему аутентификации при работе с вебсокетами)
 */

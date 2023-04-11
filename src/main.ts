@@ -6,19 +6,20 @@ import * as session from 'express-session';
 import * as passport from 'passport';
 import { ExtendedException } from './helpers/exception.filter';
 import { resolve } from 'path';
-import * as cookieParser from 'cookie-parser'; // Куда куки парсер опять пропал с типами? И почему ты вообще работаешь, если пакет не установлен?
+import * as cookieParser from 'cookie-parser'; // TODO: Куда куки парсер опять пропал с типами? И почему ты вообще работаешь, если пакет не установлен? Поконсолить cookieParser
+import { SessionAdapter } from './modules/auth/session-adapter';
 
 async function bootstrap() {
   const app = await NestFactory.create<NestExpressApplication>(AppModule);
 
   // TODO: Почитай документацию на счет того, что это невзрослый подход, не продакшен - https://docs.nestjs.com/techniques/session
-  /*
-  const sessionConfig = { 
+  // А тут по сессиям в целом:
+  // Добавляет куку connect.sid?
+  const sessionMiddleware = session({
     secret: 'z73Sah701Jaxf3', // В ЕНВ (и порты-хосты тоже)
-    resave: false,
-    saveUninitialized: false,
-  }
-  */
+    resave: true,
+    saveUninitialized: true,
+});
 
   app
     .use(cookieParser())
@@ -26,10 +27,11 @@ async function bootstrap() {
     .useStaticAssets(resolve(__dirname, "../public"))
     .useGlobalFilters(new ExtendedException())
     // Вот это поворот. В какой момент стало работать без вас?
-    // .use(session(sessionConfig))
-    // Лишнее вроде, но еще поэкспериментирую:
-    // .use(passport.initialize())
-    // .use(passport.session())
+    // Странности, но и без следующих трех прекрасно работает. Но пасспорт сешн и инициализ похоже не будут раотать без экспресс-сешн
+    .use(sessionMiddleware)
+    .use(passport.initialize())
+    .use(passport.session())
+    .useWebSocketAdapter(new SessionAdapter(sessionMiddleware, app))
     .enableCors({
       credentials: true,
       origin: 'http://localhost:3001', // Если бы фронтенд был на 3001 порту (в итоге он у меня в серв-статике). Если без этого параметра - выключит CORS везде.

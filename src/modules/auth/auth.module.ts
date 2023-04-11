@@ -5,15 +5,14 @@ import { JwtStrategy } from './jwt.strategy';
 import { UsersModule } from '../users/users.module';
 import { AuthController } from './auth.controller';
 import { AuthService } from './auth.service';
+import { SessionSerializer } from './session-serializer';
 
 @Module({
   imports: [
-    /*
-    Почему вообще работает? И с какого момента?
+    // Почему вообще работает? И с какого момента? (закомменчивал и всё равно работало)
     PassportModule.register({
-      // session: true, // списал из инета, хз что значит. РАЗБЕРИСЬ. И может можно будет без экспресс-сессии обойтись, если тут поставлю тру, а в мэйне верну то, что связано с пасспортом?
+      session: true,
     }),
-    */
     JwtModule.register({
       secret: 'asd79kmr', // TODO: в енв (и узнать откуда берется по нормальному) - побольше абракадабры сюда для безопасности - разный регистр и символы типа _ $ # > ? ^ (если все из них допустимы)
       // По-хорошему секрет берется из некоего AppConfig().jwtSecret
@@ -21,7 +20,8 @@ import { AuthService } from './auth.service';
     }),
     UsersModule,
   ],
-  providers: [AuthService, JwtStrategy],
+  providers: [AuthService, JwtStrategy, SessionSerializer],
   controllers: [AuthController],
+  exports: [PassportModule, AuthService, JwtStrategy, SessionSerializer],
 })
 export class AuthModule {}
