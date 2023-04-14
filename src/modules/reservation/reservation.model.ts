@@ -33,14 +33,12 @@ export class Reservation {
   @Prop({
     required: true,
     unique: false,
-    default: new Date().toISOString(),
   })
   dateStart: Date;
 
   @Prop({
     required: true,
     unique: false,
-    default: new Date().toISOString(),
   })
   dateEnd: Date;
 

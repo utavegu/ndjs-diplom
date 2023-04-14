@@ -36,9 +36,7 @@ export const getAllBookedDates = (allStartEndRoomReservationDates) => {
   return allBookedDates.flat().sort((a, b) => a - b)
 }
 
-export const getPrettyDatesString = (date) => {
-  format(fromUnixTime(date), 'dd/MM/yyyy')
-}
+export const getPrettyDatesString = (date) => format(fromUnixTime(date), 'dd/MM/yyyy');
 
 export const determineRelevanceOfDate = (dateStart: Date, dateEnd: Date) => {
   if (isPast(dateStart) || isPast(dateEnd)) {

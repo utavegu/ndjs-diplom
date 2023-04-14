@@ -27,9 +27,8 @@ export class ReservationService implements IReservation {
 
     determineRelevanceOfDate(dateStart, dateEnd)
 
-    // TODO: Всё-таки потести, если тут пустой массив придёт
     const roomReservations = await this.ReservationModel.find({ hotelId, roomId });
-
+ 
     const allRoomReservationsDates = roomReservations?.map((reservation) => ({
       dateStart: reservation.dateStart,
       dateEnd: reservation.dateEnd,
