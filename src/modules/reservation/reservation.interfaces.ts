@@ -16,7 +16,6 @@ interface ReservationSearchOptions {
 }
 
 interface IReservation {
-  // Метод IReservation.addReservation должен проверять, доступен ли номер на заданную дату.
   addReservation(data: ReservationDto): Promise<Reservation>;
   removeReservation(id: ID): Promise<void>;
   getReservations(

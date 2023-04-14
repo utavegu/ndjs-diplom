@@ -6,7 +6,7 @@ import * as session from 'express-session';
 import * as passport from 'passport';
 import { ExtendedException } from './helpers/exception.filter';
 import { resolve } from 'path';
-import * as cookieParser from 'cookie-parser'; // TODO: Куда куки парсер опять пропал с типами? И почему ты вообще работаешь, если пакет не установлен? Поконсолить cookieParser
+import * as cookieParser from 'cookie-parser';
 import { SessionAdapter } from './modules/auth/session-adapter';
 
 async function bootstrap() {

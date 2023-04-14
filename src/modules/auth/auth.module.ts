@@ -16,7 +16,7 @@ import { SessionSerializer } from './session-serializer';
     JwtModule.register({
       secret: 'asd79kmr', // TODO: в енв (и узнать откуда берется по нормальному) - побольше абракадабры сюда для безопасности - разный регистр и символы типа _ $ # > ? ^ (если все из них допустимы)
       // По-хорошему секрет берется из некоего AppConfig().jwtSecret
-      signOptions: { expiresIn: `${30}s` }, // В ЕНВ, можно указывать в днях - '7d'
+      signOptions: { expiresIn: `${9000}s` }, // В ЕНВ, можно указывать в днях - '7d'
     }),
     UsersModule,
   ],
