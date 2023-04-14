@@ -1,5 +1,5 @@
 /* eslint-disable prettier/prettier */
-import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
+import { BadRequestException, ForbiddenException, HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { determineRelevanceOfDate, findArraysMatchingElements, getAllBookedDates, getDatesRange, getPrettyDatesString } from 'src/helpers/utils';
@@ -10,6 +10,8 @@ import {
   ReservationSearchOptions,
 } from './reservation.interfaces';
 import { Reservation, ReservationDocument } from './reservation.model';
+import { User } from '../users/schemas/user.schema';
+import { Roles } from '../users/typing/enums/roles.enum';
 
 @Injectable()
 export class ReservationService implements IReservation {
@@ -61,10 +63,10 @@ export class ReservationService implements IReservation {
       select: 'description images',
     });
 
-    // TODO: Как иначе проверять существование номера или отеля я не знаю, раз мне нельзя по ТЗ их дёргать из этого модуля
+    // TODO: Как иначе проверять существование номера или отеля я не знаю, раз мне нельзя по ТЗ их дёргать из этого модуля. Однако это дичь и есть баги. Когда вопрос задашь, сделай нормально, дергая отель или номер в самом начале метода. И изЕнаблед можно будет нормально проверять
     if (!newReservation.roomId) {
-      // TODO: И сразу удаляй эту резервацию (когда метод будет), потому что как сделать иначе, я хз
-      // Также нужно проверять, что номер не отключён
+      await this.ReservationModel.deleteOne({ id: newReservation.id })
+      // Также нужно проверять, что номер не отключён (isEnabled)
       throw new HttpException(
         'НЕСУЩЕСТВУЮЩИЙ НОМЕР!',
         HttpStatus.BAD_REQUEST,
@@ -72,7 +74,7 @@ export class ReservationService implements IReservation {
     };
 
     if (!newReservation.hotelId) {
-      // TODO: И сразу удаляй эту резервацию (когда метод будет), потому что как сделать иначе, я хз
+      await this.ReservationModel.deleteOne({ id: newReservation.id })
       throw new HttpException(
         'НЕСУЩЕСТВУЮЩИЙ ОТЕЛЬ!',
         HttpStatus.BAD_REQUEST,
@@ -82,8 +84,20 @@ export class ReservationService implements IReservation {
     return newReservation;
   }
 
-  removeReservation(id: ID): Promise<void> {
-    throw new Error('Method not implemented.');
+  async removeReservation(id: ID, user: User & { id: ID }): Promise<void> {
+    const targetReservation = await this.ReservationModel.findById(id);
+    if (!targetReservation) {
+      throw new BadRequestException('Такой брони не существует')
+    }
+    if (user.role === Roles.CLIENT) {
+      if (user.id.toString() === String(targetReservation.userId)) {
+        await this.ReservationModel.deleteOne({ id })
+      } else {
+        throw new ForbiddenException('Объявление может удалить только тот же пользователь, который его создал!')
+      }
+    } else if (user.role === Roles.MANAGER) {
+      await this.ReservationModel.deleteOne({ id })
+    }
   }
 
   getReservations(filter: ReservationSearchOptions): Promise<Reservation[]> {

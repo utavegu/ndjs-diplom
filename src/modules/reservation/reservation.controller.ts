@@ -3,6 +3,7 @@ import {
   Controller,
   Delete,
   Get,
+  Param,
   Post,
   Request,
   UseGuards,
@@ -65,15 +66,27 @@ export class ReservationController {
   @Delete('client/reservations/:id')
   @Role(Roles.CLIENT)
   @UseGuards(JwtAuthGuard, LoginedUsersGuard, RoleGuard)
-  clientReservationCancel() {
-    return this.reservationService.removeReservation;
+  clientReservationCancel(
+    @Param('id') id: ID,
+    @Request() request: RequestType & { user: User & { id: ID } },
+  ) {
+    return this.reservationService.removeReservation(
+      validateId(id),
+      request.user,
+    );
   }
 
   // Отмена бронирования менеджером. Отменяет бронь пользователя по id брони.
   @Delete('manager/reservations/:id')
   @Role(Roles.MANAGER)
   @UseGuards(JwtAuthGuard, LoginedUsersGuard, RoleGuard)
-  managerReservationCancel() {
-    return this.reservationService.removeReservation;
+  managerReservationCancel(
+    @Param('id') id: ID,
+    @Request() request: RequestType & { user: User & { id: ID } },
+  ) {
+    return this.reservationService.removeReservation(
+      validateId(id),
+      request.user,
+    );
   }
 }

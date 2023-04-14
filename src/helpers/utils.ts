@@ -4,8 +4,10 @@
 import { HttpException, HttpStatus } from "@nestjs/common";
 import { addDays, differenceInDays, format, fromUnixTime, isPast } from "date-fns";
 
+/** Ищет совпадающие элементы в двух массивах */
 export const findArraysMatchingElements = (arr1, arr2) => arr1.filter((n) => arr2.indexOf(n) !== -1);
 
+/** Создает диапазон (массив) дат между начальной и конечной */
 export const getDatesRange = (startDate: Date, endDate: Date) => {
   const reservedDaysCount = differenceInDays(endDate, startDate);
 
@@ -25,6 +27,7 @@ export const getDatesRange = (startDate: Date, endDate: Date) => {
   return datesRange.map((date) => +new Date(date) / 1000);
 }
 
+/** Создает матрицу (двумерный массив) всех забронированных дат, а затем извлекает их до одномерного массива */
 export const getAllBookedDates = (allStartEndRoomReservationDates) => {
   const allBookedDates = [];
 
@@ -36,8 +39,10 @@ export const getAllBookedDates = (allStartEndRoomReservationDates) => {
   return allBookedDates.flat().sort((a, b) => a - b)
 }
 
+/** Преобразует дату из UNIX-timestamp и форматирует ее в привычный вид */
 export const getPrettyDatesString = (date) => format(fromUnixTime(date), 'dd/MM/yyyy');
 
+/** Проверяет, что начальная и конечная даты ещё не наступили */
 export const determineRelevanceOfDate = (dateStart: Date, dateEnd: Date) => {
   if (isPast(dateStart) || isPast(dateEnd)) {
     throw new HttpException(
