@@ -5,6 +5,7 @@ import {
   Get,
   Param,
   Post,
+  Query,
   Request,
   UseGuards,
   UsePipes,
@@ -15,7 +16,10 @@ import { Role } from 'src/helpers/decorators/role.decorator';
 import { JwtAuthGuard } from '../auth/guards/jwt.auth.guard';
 import { LoginedUsersGuard } from '../auth/guards/logined-users.guard';
 import { RoleGuard } from '../auth/guards/role.guard';
-import { ReservationDto } from './reservation.interfaces';
+import {
+  ReservationDto,
+  ReservationSearchOptions,
+} from './reservation.interfaces';
 import { Request as RequestType } from 'express';
 import { User } from '../users/schemas/user.schema';
 import { ID } from 'src/types/id';
@@ -50,16 +54,30 @@ export class ReservationController {
   @Get('client/reservations')
   @Role(Roles.CLIENT)
   @UseGuards(JwtAuthGuard, LoginedUsersGuard, RoleGuard)
-  getClientReservations() {
-    return this.reservationService.getReservations;
+  getClientReservations(
+    @Request() request: RequestType & { user: User & { id: ID } },
+    @Query() { dateStart, dateEnd }: Omit<ReservationSearchOptions, 'userId'>,
+  ) {
+    return this.reservationService.getReservations({
+      userId: validateId(request?.user.id),
+      dateStart,
+      dateEnd,
+    });
   }
 
   // Просмотр мэнеджером списка броней конкретного пользователя.
   @Get('manager/reservations/:userId')
   @Role(Roles.MANAGER)
   @UseGuards(JwtAuthGuard, LoginedUsersGuard, RoleGuard)
-  getManagerReservations() {
-    return this.reservationService.getReservations;
+  getManagerReservations(
+    @Param('userId') userId: ID,
+    @Query() { dateStart, dateEnd }: Omit<ReservationSearchOptions, 'userId'>,
+  ) {
+    return this.reservationService.getReservations({
+      userId: validateId(userId),
+      dateStart,
+      dateEnd,
+    });
   }
 
   // Отмена бронирования клиентом. Отменяет бронь пользователя.

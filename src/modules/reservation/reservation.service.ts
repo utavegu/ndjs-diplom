@@ -100,7 +100,25 @@ export class ReservationService implements IReservation {
     }
   }
 
-  getReservations(filter: ReservationSearchOptions): Promise<Reservation[]> {
-    throw new Error('Method not implemented.');
+  async getReservations({ userId, dateStart, dateEnd }: ReservationSearchOptions): Promise<Reservation[]> {
+    const selectionCriteria = { userId, dateStart, dateEnd };
+
+    for (const param in selectionCriteria) {
+      if (!selectionCriteria[param]) {
+        delete selectionCriteria[param];
+      }
+    }
+      
+    return await this.ReservationModel
+      .find(selectionCriteria)
+      .select('-__v -_id -userId')
+      .populate({
+        path: 'hotelId', // только'hotel'
+        select: 'title description -_id',
+      })
+      .populate({
+        path: 'roomId', // под именем hotelRoom
+        select: 'description images -_id',
+      });
   }
 }
