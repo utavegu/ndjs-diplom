@@ -1,8 +1,8 @@
 import * as bcrypt from 'bcrypt';
+import { SALT_ROUNDS } from 'src/constants';
 
 const encryptPassword = async (password: string): Promise<string> => {
-  const saltRounds = 7; // TODO В енв. И помни, что когда достаешь оттуда - надо будет в намбер преобразовать. Хотя не знаю на сколько это секретная инфа. Можно и просто в константы, наверное.
-  const salt = await bcrypt.genSalt(saltRounds);
+  const salt = await bcrypt.genSalt(SALT_ROUNDS);
   const passwordHash = await bcrypt.hash(password, salt);
   return passwordHash;
 };

@@ -14,11 +14,16 @@ import { join } from 'path';
 
 @Module({
   imports: [
-    MongooseModule.forRoot('mongodb://mongo:27017', {
-      user: 'root',
-      pass: 'example',
-      dbName: 'hotels-aggregator',
-    }),
+    MongooseModule.forRoot(
+      `mongodb://${process.env.MONGODB_SERVICE_NAME}:${
+        process.env.MONGODB_INTERNAL_PORT || 27017
+      }`,
+      {
+        user: process.env.MONGODB_LOGIN || 'root',
+        pass: process.env.MONGODB_PASSWORD || 'example',
+        dbName: process.env.DB_NAME,
+      },
+    ),
     UsersModule,
     AuthModule,
     UsersManagementModule,

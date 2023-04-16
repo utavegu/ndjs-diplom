@@ -14,7 +14,7 @@ import { MulterModule } from '@nestjs/platform-express';
       { name: HotelRoom.name, schema: HotelRoomSchema },
     ]),
     MulterModule.register({
-      dest: './files/img', // TODO: по хорошему надо ещё посносить директорию файлс и снова опробовать заливку, что он не будет бузить, что такой директории нет. И в ЕНВ сунуть. Тут не секретность, но особенности сервера
+      dest: process.env.IMAGE_STORAGE_DESTINATION, // TODO: по хорошему надо ещё посносить директорию файлс и снова опробовать заливку, что он не будет бузить, что такой директории нет.
     }),
   ],
   providers: [HotelsService, HotelsRoomsService],

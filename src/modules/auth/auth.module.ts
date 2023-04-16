@@ -6,6 +6,7 @@ import { UsersModule } from '../users/users.module';
 import { AuthController } from './auth.controller';
 import { AuthService } from './auth.service';
 import { SessionSerializer } from './session-serializer';
+import { JWT_TOKEN_EXPIRES } from 'src/constants';
 
 @Module({
   imports: [
@@ -14,9 +15,9 @@ import { SessionSerializer } from './session-serializer';
       session: true,
     }),
     JwtModule.register({
-      secret: 'asd79kmr', // TODO: в енв (и узнать откуда берется по нормальному) - побольше абракадабры сюда для безопасности - разный регистр и символы типа _ $ # > ? ^ (если все из них допустимы)
+      secret: process.env.SECRET_OR_KEY, // TODO: узнать откуда берется по нормальному
       // По-хорошему секрет берется из некоего AppConfig().jwtSecret
-      signOptions: { expiresIn: `${9000}s` }, // В ЕНВ, можно указывать в днях - '7d'
+      signOptions: { expiresIn: `${JWT_TOKEN_EXPIRES}s` }, // можно указывать и в днях - '7d'
     }),
     UsersModule,
   ],

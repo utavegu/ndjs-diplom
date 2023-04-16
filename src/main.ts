@@ -16,7 +16,7 @@ async function bootstrap() {
   // А тут по сессиям в целом:
   // Добавляет куку connect.sid?
   const sessionMiddleware = session({
-    secret: 'z73Sah701Jaxf3', // В ЕНВ (и порты-хосты тоже)
+    secret: process.env.SESSION_SECRET,
     resave: true,
     saveUninitialized: true,
 });
@@ -37,9 +37,6 @@ async function bootstrap() {
       origin: 'http://localhost:3001', // Если бы фронтенд был на 3001 порту (в итоге он у меня в серв-статике). Если без этого параметра - выключит CORS везде.
     });
 
-    // TODO: Неплохую помойку развел... часть в сетап напрашивается. "@nestjs/config" ? https://docs.nestjs.com/techniques/configuration. Если успеешь, конечно.
-    
-
-  await app.listen(3000);
+  await app.listen(process.env.AGGREGATOR_INTERNAL_PORT || 3000); // TODO: А интернал-ли? Это же тот порт, который наружу торчит. Побалуйся.
 }
 bootstrap();

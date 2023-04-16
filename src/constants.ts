@@ -9,3 +9,5 @@ export const ERROR_MESSAGES = {
   INVALID_ID: 'Ошибка ввода ID!',
   DO_NOT_ACCESS_RIGHTS: 'У вас недостаточно прав доступа!',
 };
+export const SALT_ROUNDS = 7;
+export const JWT_TOKEN_EXPIRES = 9000; // в секундах

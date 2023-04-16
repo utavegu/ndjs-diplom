@@ -14,7 +14,7 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
         // ExtractJwt.fromAuthHeaderAsBearerToken(), // Видимо, если нужно разрешить оба варианта извлечения токена - и через заголовок, и из кукисов
       ]),
       // ignoreExpiration: false, // TODO: Разберись в этом параметре
-      secretOrKey: 'asd79kmr', // TODO: env // Должен браться из некоего constructor(private readonly configService: ConfigService), import { ConfigService } from '@nestjs/config'; тоже посолиднее сложность сделай
+      secretOrKey: process.env.SECRET_OR_KEY, // В идеале должен браться из некоего constructor(private readonly configService: ConfigService), import { ConfigService } from '@nestjs/config';
     });
   }
 
