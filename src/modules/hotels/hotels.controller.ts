@@ -36,7 +36,6 @@ import { getBooleanValue, getImagesPaths } from './hotels.utils';
 import { validateId } from 'src/helpers/idValidator';
 import { Role } from 'src/helpers/decorators/role.decorator';
 import { Roles } from '../users/typing/enums/roles.enum';
-import { JwtAuthGuard } from 'src/modules/auth/guards/jwt.auth.guard';
 import { LoginedUsersGuard } from 'src/modules/auth/guards/logined-users.guard';
 import { RoleGuard } from 'src/modules/auth/guards/role.guard';
 // import { updateHotelValidationSchema } from './validation/update.hotel.validation.schema';
@@ -50,7 +49,6 @@ export class HotelsController {
 
   // Поиск номеров
   @Get('common/hotel-rooms')
-  @UseGuards(JwtAuthGuard)
   // TODO: Валидация квери-параметров! Валидацию id, кстати, можно через пайп сделать... а как заставить джой валидировать не только боди, но и квери параметры, например? Всё это надо бы валидировать через пайп, исправь
   searchHotelRooms(@Query() { limit, offset, hotel }, @Request() request) {
     if (isNaN(limit) || isNaN(offset)) {
@@ -75,7 +73,7 @@ export class HotelsController {
   // Добавление гостиницы
   @Post('admin/hotels')
   @Role(Roles.ADMIN)
-  @UseGuards(JwtAuthGuard, LoginedUsersGuard, RoleGuard)
+  @UseGuards(LoginedUsersGuard, RoleGuard)
   @UsePipes(new ValidationPipe(createHotelValidationSchema))
   addHotel(@Body() body: CreateHotelDto) {
     return this.hotelsService.create(body);
@@ -84,7 +82,7 @@ export class HotelsController {
   // Получение списка гостиниц
   @Get('admin/hotels')
   @Role(Roles.ADMIN)
-  @UseGuards(JwtAuthGuard, LoginedUsersGuard, RoleGuard)
+  @UseGuards(LoginedUsersGuard, RoleGuard)
   getHotels(@Query() { limit, offset }) {
     return this.hotelsService.search({ limit, offset });
   }
@@ -92,7 +90,7 @@ export class HotelsController {
   // Изменение описания гостиницы
   @Put('admin/hotels/:id')
   @Role(Roles.ADMIN)
-  @UseGuards(JwtAuthGuard, LoginedUsersGuard, RoleGuard)
+  @UseGuards(LoginedUsersGuard, RoleGuard)
   // @UsePipes(new ValidationPipe(updateHotelValidationSchema)) // TODO: Лучше разобраться с валидацией и пайпами
   editHotel(@Body() body: UpdateHotelParams, @Param('id') id: ID) {
     return this.hotelsService.update(validateId(id), body);
@@ -101,7 +99,7 @@ export class HotelsController {
   // Добавление номера
   @Post('admin/hotel-rooms')
   @Role(Roles.ADMIN)
-  @UseGuards(JwtAuthGuard, LoginedUsersGuard, RoleGuard)
+  @UseGuards(LoginedUsersGuard, RoleGuard)
   // @UsePipes(new ValidationPipe(createHotelRoomValidationSchema))
   @UseInterceptors(
     FilesInterceptor(FORM_FIELD_NAME, MAX_IMAGES_COUNT, filesInterceptorSetup),
@@ -121,7 +119,7 @@ export class HotelsController {
   // Изменение описания номера
   @Put('admin/hotel-rooms/:id')
   @Role(Roles.ADMIN)
-  @UseGuards(JwtAuthGuard, LoginedUsersGuard, RoleGuard)
+  @UseGuards(LoginedUsersGuard, RoleGuard)
   // @UsePipes(new ValidationPipe(createHotelRoomValidationSchema))
   @UseInterceptors(
     FilesInterceptor(FORM_FIELD_NAME, MAX_IMAGES_COUNT, filesInterceptorSetup),

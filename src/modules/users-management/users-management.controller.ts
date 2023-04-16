@@ -21,12 +21,11 @@ import { ValidationPipe } from 'src/helpers/validation.pipe';
 import { AdminReturnedUserType } from '../users/typing/types/returned-user.type';
 import { Role } from 'src/helpers/decorators/role.decorator';
 import { Roles } from '../users/typing/enums/roles.enum';
-import { JwtAuthGuard } from 'src/modules/auth/guards/jwt.auth.guard';
 import { LoginedUsersGuard } from 'src/modules/auth/guards/logined-users.guard';
 import { RoleGuard } from 'src/modules/auth/guards/role.guard';
 
 @Controller()
-@UseGuards(JwtAuthGuard, LoginedUsersGuard, RoleGuard)
+@UseGuards(LoginedUsersGuard, RoleGuard)
 export class UsersManagementController {
   constructor(private readonly usersService: UsersService) {}
 

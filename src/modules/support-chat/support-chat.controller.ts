@@ -18,7 +18,6 @@ import { CreateSupportRequestDto } from './typing/interfaces/support-chat.interf
 import { ID } from 'src/types/id';
 import { Roles } from '../users/typing/enums/roles.enum';
 import { Role } from 'src/helpers/decorators/role.decorator';
-import { JwtAuthGuard } from 'src/modules/auth/guards/jwt.auth.guard';
 import { LoginedUsersGuard } from 'src/modules/auth/guards/logined-users.guard';
 import { RoleGuard } from 'src/modules/auth/guards/role.guard';
 
@@ -33,7 +32,7 @@ export class SupportChatController {
   // Позволяет пользователю с ролью client создать обращение в техподдержку
   @Post('client/support-requests')
   @Role(Roles.CLIENT)
-  @UseGuards(JwtAuthGuard, LoginedUsersGuard, RoleGuard)
+  @UseGuards(LoginedUsersGuard, RoleGuard)
   @HttpCode(HttpStatus.OK)
   async createClientMessage(
     @Body('text') text: CreateSupportRequestDto['text'],
@@ -48,7 +47,7 @@ export class SupportChatController {
   // Позволяет пользователю с ролью client получить список обращений для текущего пользователя.
   @Get('client/support-requests')
   @Role(Roles.CLIENT)
-  @UseGuards(JwtAuthGuard, LoginedUsersGuard, RoleGuard)
+  @UseGuards(LoginedUsersGuard, RoleGuard)
   @HttpCode(HttpStatus.OK)
   async clientFetchAllAppeals(@Request() request, @Query() query) {
     return await this.supportRequestService.findSupportRequests({
@@ -62,7 +61,7 @@ export class SupportChatController {
   // Позволяет пользователю с ролью manager получить список обращений от клиентов.
   @Get('manager/support-requests')
   @Role(Roles.MANAGER)
-  @UseGuards(JwtAuthGuard, LoginedUsersGuard, RoleGuard)
+  @UseGuards(LoginedUsersGuard, RoleGuard)
   @HttpCode(HttpStatus.OK)
   async managerFetchAllAppeals(@Request() request, @Query() query) {
     return await this.supportRequestService.findSupportRequests({

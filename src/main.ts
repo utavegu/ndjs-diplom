@@ -8,6 +8,7 @@ import { ExtendedException } from './helpers/exception.filter';
 import { resolve } from 'path';
 import * as cookieParser from 'cookie-parser';
 import { SessionAdapter } from './modules/auth/session-adapter';
+import { JwtAuthGuard } from './modules/auth/guards/jwt.auth.guard';
 
 async function bootstrap() {
   const app = await NestFactory.create<NestExpressApplication>(AppModule);
@@ -24,8 +25,9 @@ async function bootstrap() {
   app
     .use(cookieParser())
     .setGlobalPrefix('api')
-    .useStaticAssets(resolve(__dirname, "../public"))
+    .useGlobalGuards(new JwtAuthGuard())
     .useGlobalFilters(new ExtendedException())
+    .useStaticAssets(resolve(__dirname, "../public"))
     // Вот это поворот. В какой момент стало работать без вас?
     // Странности, но и без следующих трех прекрасно работает. Но пасспорт сешн и инициализ похоже не будут раотать без экспресс-сешн
     .use(sessionMiddleware)

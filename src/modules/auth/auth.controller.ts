@@ -14,7 +14,6 @@ import { UsersService } from '../users/users.service';
 import { User } from '../users/schemas/user.schema';
 import { UserDto } from '../users/typing/interfaces/user.dto';
 import { ValidationPipe } from 'src/helpers/validation.pipe';
-import { JwtAuthGuard } from 'src/modules/auth/guards/jwt.auth.guard';
 import { createUserValidationSchema } from '../users/create.user.validation.schema';
 import { ClientReturnedUserType } from '../users/typing/types/returned-user.type';
 import { OnlyGuestGuard } from 'src/modules/auth/guards/only-guest.guard';
@@ -30,7 +29,7 @@ export class AuthController {
   ) {}
 
   @Post('auth/login')
-  @UseGuards(JwtAuthGuard, OnlyGuestGuard)
+  @UseGuards(OnlyGuestGuard)
   @HttpCode(HttpStatus.OK)
   async login(
     @Body() body: Omit<UserDto, 'name' | 'contactPhone' | 'role'>,
@@ -57,7 +56,7 @@ export class AuthController {
   }
 
   @Post('auth/logout')
-  @UseGuards(JwtAuthGuard, LoginedUsersGuard)
+  @UseGuards(LoginedUsersGuard)
   @HttpCode(HttpStatus.OK)
   async logout(
     @Response({ passthrough: true }) response: ResponseType
@@ -68,7 +67,7 @@ export class AuthController {
   }
 
   @Post('client/register')
-  @UseGuards(JwtAuthGuard, OnlyGuestGuard)
+  @UseGuards(OnlyGuestGuard)
   @HttpCode(HttpStatus.CREATED)
   @UsePipes(new ValidationPipe(createUserValidationSchema))
   async create(

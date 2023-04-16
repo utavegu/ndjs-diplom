@@ -13,7 +13,6 @@ import {
 import { ReservationService } from './reservation.service';
 import { Roles } from '../users/typing/enums/roles.enum';
 import { Role } from 'src/helpers/decorators/role.decorator';
-import { JwtAuthGuard } from '../auth/guards/jwt.auth.guard';
 import { LoginedUsersGuard } from '../auth/guards/logined-users.guard';
 import { RoleGuard } from '../auth/guards/role.guard';
 import {
@@ -35,7 +34,7 @@ export class ReservationController {
   @Post('client/reservations')
   @Role(Roles.CLIENT)
   @UsePipes(new ValidationPipe(createReservationValidationSchema))
-  @UseGuards(JwtAuthGuard, LoginedUsersGuard, RoleGuard)
+  @UseGuards(LoginedUsersGuard, RoleGuard)
   clientCreateReservation(
     // eslint-disable-next-line prettier/prettier
     @Body() { hotelId, roomId, dateStart, dateEnd }: Omit<ReservationDto, 'userId'>,
@@ -53,7 +52,7 @@ export class ReservationController {
   // Список броней текущего пользователя.
   @Get('client/reservations')
   @Role(Roles.CLIENT)
-  @UseGuards(JwtAuthGuard, LoginedUsersGuard, RoleGuard)
+  @UseGuards(LoginedUsersGuard, RoleGuard)
   getClientReservations(
     @Request() request: RequestType & { user: User & { id: ID } },
     @Query() { dateStart, dateEnd }: Omit<ReservationSearchOptions, 'userId'>,
@@ -68,7 +67,7 @@ export class ReservationController {
   // Просмотр мэнеджером списка броней конкретного пользователя.
   @Get('manager/reservations/:userId')
   @Role(Roles.MANAGER)
-  @UseGuards(JwtAuthGuard, LoginedUsersGuard, RoleGuard)
+  @UseGuards(LoginedUsersGuard, RoleGuard)
   getManagerReservations(
     @Param('userId') userId: ID,
     @Query() { dateStart, dateEnd }: Omit<ReservationSearchOptions, 'userId'>,
@@ -83,7 +82,7 @@ export class ReservationController {
   // Отмена бронирования клиентом. Отменяет бронь пользователя.
   @Delete('client/reservations/:id')
   @Role(Roles.CLIENT)
-  @UseGuards(JwtAuthGuard, LoginedUsersGuard, RoleGuard)
+  @UseGuards(LoginedUsersGuard, RoleGuard)
   clientReservationCancel(
     @Param('id') id: ID,
     @Request() request: RequestType & { user: User & { id: ID } },
@@ -97,7 +96,7 @@ export class ReservationController {
   // Отмена бронирования менеджером. Отменяет бронь пользователя по id брони.
   @Delete('manager/reservations/:id')
   @Role(Roles.MANAGER)
-  @UseGuards(JwtAuthGuard, LoginedUsersGuard, RoleGuard)
+  @UseGuards(LoginedUsersGuard, RoleGuard)
   managerReservationCancel(
     @Param('id') id: ID,
     @Request() request: RequestType & { user: User & { id: ID } },
