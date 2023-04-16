@@ -13,7 +13,7 @@ import {
   Request,
   BadRequestException,
 } from '@nestjs/common';
-import { ValidationPipe } from 'src/helpers/validation.pipe';
+import { ValidationPipe } from 'src/validation/validation.pipe';
 import { HotelsRoomsService } from './hotels-rooms.service';
 import { HotelsService } from './hotels.service';
 import {
@@ -29,12 +29,12 @@ import {
   MAX_IMAGES_COUNT,
   filesInterceptorSetup,
   imageParseFilePipeInstance,
-} from 'src/helpers/multer.setup';
+} from 'src/config/multer.setup';
 import { ObjectId } from 'mongoose'; // Грязненько, конечно
 import { ID } from 'src/types/id';
 import { getBooleanValue, getImagesPaths } from './hotels.utils';
-import { validateId } from 'src/helpers/idValidator';
-import { Role } from 'src/helpers/decorators/role.decorator';
+import { validateId } from 'src/validation/idValidator';
+import { Role } from 'src/decorators/role.decorator';
 import { Roles } from '../users/typing/enums/roles.enum';
 import { LoginedUsersGuard } from 'src/modules/auth/guards/logined-users.guard';
 import { RoleGuard } from 'src/modules/auth/guards/role.guard';

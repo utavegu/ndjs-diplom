@@ -17,7 +17,7 @@ import { ChatRoleGuard } from 'src/modules/auth/guards/chat.role.guard';
 import { CreateSupportRequestDto } from './typing/interfaces/support-chat.interface';
 import { ID } from 'src/types/id';
 import { Roles } from '../users/typing/enums/roles.enum';
-import { Role } from 'src/helpers/decorators/role.decorator';
+import { Role } from 'src/decorators/role.decorator';
 import { LoginedUsersGuard } from 'src/modules/auth/guards/logined-users.guard';
 import { RoleGuard } from 'src/modules/auth/guards/role.guard';
 

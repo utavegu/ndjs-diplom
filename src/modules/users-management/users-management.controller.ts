@@ -17,9 +17,9 @@ import { ISearchUserParams } from '../users/typing/interfaces/ISearchUserParams'
 // import { Roles } from '../users/typing/enums/roles.enum';
 import { createUserValidationSchema } from '../users/create.user.validation.schema';
 import { UserDto } from '../users/typing/interfaces/user.dto';
-import { ValidationPipe } from 'src/helpers/validation.pipe';
+import { ValidationPipe } from 'src/validation/validation.pipe';
 import { AdminReturnedUserType } from '../users/typing/types/returned-user.type';
-import { Role } from 'src/helpers/decorators/role.decorator';
+import { Role } from 'src/decorators/role.decorator';
 import { Roles } from '../users/typing/enums/roles.enum';
 import { LoginedUsersGuard } from 'src/modules/auth/guards/logined-users.guard';
 import { RoleGuard } from 'src/modules/auth/guards/role.guard';

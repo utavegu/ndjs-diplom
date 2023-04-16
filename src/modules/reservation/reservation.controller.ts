@@ -12,7 +12,7 @@ import {
 } from '@nestjs/common';
 import { ReservationService } from './reservation.service';
 import { Roles } from '../users/typing/enums/roles.enum';
-import { Role } from 'src/helpers/decorators/role.decorator';
+import { Role } from 'src/decorators/role.decorator';
 import { LoginedUsersGuard } from '../auth/guards/logined-users.guard';
 import { RoleGuard } from '../auth/guards/role.guard';
 import {
@@ -23,8 +23,8 @@ import { Request as RequestType } from 'express';
 import { User } from '../users/schemas/user.schema';
 import { ID } from 'src/types/id';
 import { createReservationValidationSchema } from './validation/create.reservation.validation.schema';
-import { ValidationPipe } from 'src/helpers/validation.pipe';
-import { validateId } from 'src/helpers/idValidator';
+import { ValidationPipe } from 'src/validation/validation.pipe';
+import { validateId } from 'src/validation/idValidator';
 
 @Controller()
 export class ReservationController {

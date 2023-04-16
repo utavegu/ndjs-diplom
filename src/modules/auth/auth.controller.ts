@@ -13,7 +13,7 @@ import { AuthService } from './auth.service';
 import { UsersService } from '../users/users.service';
 import { User } from '../users/schemas/user.schema';
 import { UserDto } from '../users/typing/interfaces/user.dto';
-import { ValidationPipe } from 'src/helpers/validation.pipe';
+import { ValidationPipe } from 'src/validation/validation.pipe';
 import { createUserValidationSchema } from '../users/create.user.validation.schema';
 import { ClientReturnedUserType } from '../users/typing/types/returned-user.type';
 import { OnlyGuestGuard } from 'src/modules/auth/guards/only-guest.guard';

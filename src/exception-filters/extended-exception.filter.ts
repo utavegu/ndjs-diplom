@@ -6,6 +6,7 @@ import {
   HttpException,
 } from '@nestjs/common';
 import { Request, Response } from 'express';
+import { format } from 'date-fns'
 import { Statuses } from '../modules/users/typing/enums/statuses.enum';
 
 @Catch(HttpException)
@@ -20,7 +21,7 @@ export class ExtendedException implements ExceptionFilter {
     response
       .status(errorCode)
       .json({
-        timestamp: new Date().toISOString(), // TODO: В более красивом виде
+        timestamp: format(new Date(), 'dd/MM/yyyy'),
         status: Statuses.FAIL,
         data: {
           errorMessage,

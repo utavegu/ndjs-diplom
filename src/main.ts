@@ -4,7 +4,7 @@ import { NestExpressApplication } from "@nestjs/platform-express";
 import { AppModule } from './app.module';
 import * as session from 'express-session';
 import * as passport from 'passport';
-import { ExtendedException } from './helpers/exception.filter';
+import { ExtendedException } from './exception-filters/extended-exception.filter';
 import { resolve } from 'path';
 import * as cookieParser from 'cookie-parser';
 import { SessionAdapter } from './modules/auth/session-adapter';

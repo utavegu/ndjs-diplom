@@ -5,11 +5,11 @@ import {
   MaxFileSizeValidator,
   FileTypeValidator,
 } from '@nestjs/common';
+import { getRandomFileName } from 'src/helpers/utils';
 
 const FORM_FIELD_NAME = 'images';
 const MAX_IMAGE_SIZE_IN_BYTES = 5000000; // 5Мб
 const MAX_IMAGES_COUNT = 5;
-// TODO: Дестинэйшн, регулярки и ошибку тоже можно в константы... А рандомНэйм в функцию... Но пока нет
 
 const filesInterceptorSetup = {
   storage: diskStorage({
@@ -17,11 +17,7 @@ const filesInterceptorSetup = {
     filename: (req, file, callback) => {
       const name = file.originalname.split('.')[0];
       const fileExtName = extname(file.originalname);
-      const randomName = Array(4)
-        .fill(null)
-        .map(() => Math.round(Math.random() * 16).toString(16))
-        .join('');
-      callback(null, `${name}-${randomName}${fileExtName}`);
+      callback(null, `${name}-${getRandomFileName()}${fileExtName}`);
     },
   }),
   limits: {
