@@ -12,10 +12,7 @@ services:
 
   aggregator:
     container_name: aggregator-app
-    image: node:19.1-alpine
-    working_dir: /app
-    volumes:
-      - .:/app
+    build: .
     ports:
       - $AGGREGATOR_EXTERNAL_PORT:$AGGREGATOR_INTERNAL_PORT
     environment:
@@ -28,11 +25,9 @@ services:
       - SESSION_SECRET=$SESSION_SECRET
       - SECRET_OR_KEY=$SECRET_OR_KEY
       - IMAGE_STORAGE_DESTINATION=$IMAGE_STORAGE_DESTINATION
-    command: [ "npm", "run", "start:dev" ]
     depends_on:
       - mongo
 
-# TODO: Донастроить через config.js (смотри в описании образа на Докерхабе)
   mongo-express:
     container_name: mongo-admin-panel
     image: mongo-express:1.0.0-alpha.4
