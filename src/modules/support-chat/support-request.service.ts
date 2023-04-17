@@ -56,7 +56,16 @@ export class SupportRequestService implements ISupportRequestService {
 
     await chat.updateOne({ $push: { messages: newMessage } });
 
-    this.subscribe(chat, newMessage);
+    this.eventEmitter.emit('newMessage', {
+      supportRequest,
+      message: newMessage,
+    });
+
+    /*
+    this.eventEmitter.on('newMessage', ({ supportRequest, message }) => {
+      console.log(`В чате ${supportRequest} новое сообщение "${message.text}" от ${message.author.name}`);
+    })
+    */
 
     // TODO: Понять как возвращать без __v
     return newMessage;
@@ -81,15 +90,12 @@ export class SupportRequestService implements ISupportRequestService {
     return chat.messages;
   }
 
-  // TODO: Не понимаю как должно работать, пока поменяю интерфейс
-  // subscribe(handler: (supportRequest: SupportRequest, message: Message) => void): () => void {
-  subscribe(supportRequest: SupportRequest, message: Message): void {
-    console.log(`В чате от ${supportRequest.user} новое сообщение: ${message.text}!`)
-    this.eventEmitter.emit('newMessage', {
-      supportRequest,
-      message,
+  subscribe(handler: (supportRequest: ID, message: Message) => void): () => void {
+    this.eventEmitter.on('newMessage', handler);
+    this.eventEmitter.on('newMessage', ({ supportRequest, message }) => {
+      handler(supportRequest, message);
     });
+    console.log('SUBSCRIBE')
     return;
   }
-
 }

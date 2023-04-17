@@ -3,75 +3,53 @@ import {
   MessageBody,
   SubscribeMessage,
   WebSocketGateway,
-  WsResponse,
   ConnectedSocket,
+  WebSocketServer
 } from '@nestjs/websockets';
-import { Socket } from 'socket.io';
+import { Socket, Server } from 'socket.io';
 import { Message } from './schemas/message.schema';
 import { SupportRequest } from './schemas/support-request.schema';
 import { SupportRequestService } from './support-request.service';
-
-import { EventEmitter2, OnEvent } from '@nestjs/event-emitter';
 import { Request, UseGuards } from '@nestjs/common';
 import { WsAuthenticatedGuard } from '../auth/guards/ws-authenticated.guard';
+import { ID } from 'src/types/id';
+import { User } from '../users/schemas/user.schema';
 
 // message: subscribeToChat payload: chatId - Позволяет пользователю с ролью manager или client получать новые сообщения в чате через WebSocket.
 
 @WebSocketGateway({ cors: true })
 export class SupportChatGateway {
-  constructor(
-    private readonly supportRequestsService: SupportRequestService,
-    private readonly eventEmitter: EventEmitter2
-  ) {}
+  constructor(private readonly supportRequestsService: SupportRequestService) { }
+
+  @WebSocketServer() server: Server;
 
   // Позволяет пользователю с ролью manager или client получать новые сообщения в чате через WebSocket
   // message: subscribeToChat payload: chatId
-  // ГАРДА!!!
   // @UseGuards(GatewayGuard)
   @SubscribeMessage('subscribeToChat')
   // @OnEvent('newMessage')
-  async getMessage(
+  async subscribeHandler(
     @MessageBody('chatId') chatId: string,
     @ConnectedSocket() connectedSocket: Socket,
     @Request() request,
-    payload: {
-      supportRequest: SupportRequest,
-      message: Message
-    }
-  ): Promise<WsResponse> {
-    console.log(request.user);
-    // const { supportRequest, message } = payload;
-
-    // const { user } = connectedSocket.request as any;
+  ) {
+    // console.log(request.user);
+    // const { user } = connectedSocket.request as unknown as Request & { user: User & { id: ID } };
     // console.log(user);
-    // console.log('ПРИВЕТ')
-    // console.log(supportRequest);
-    // console.log(message);
 
-    return 
-    // {
-    //   event: 'fromServer',
-    //   data: message.text,
-    // }
-
-  }
-
-  @UseGuards(WsAuthenticatedGuard)
-  @SubscribeMessage('message-from-client')
-  async addComment(@MessageBody() body): Promise<WsResponse> {
-    console.log('ГАРДА ПРОПУСТИЛА!');
-    return {
-      event: 'ws-server-response',
-      data: 'Вы ввели: ' + body,
+    const subscribeCallback = (supportRequest: ID, message: Message) => {
+      connectedSocket.emit(chatId, message);
+      this.server.emit('newMessage', {
+        chatId,
+        message,
+      });
     }
+
+    this.supportRequestsService.subscribe(subscribeCallback);
+    /*
+    Ого, доигрался:
+    (node:845) MaxListenersExceededWarning: (node) warning: possible EventEmitter memory leak detected. 11 listeners added. Use emitter.setMaxListeners() to increase limit.
+    (Use `node --trace-warnings ...` to show where the warning was created)
+    */
   }
-
 }
-
-/*
-ПЛАН:
-- Ивент эммиттер
-- Пайпы (валидация), эксепшены и тд. Перечитай теорию
-- Устранение ошибки текущей аутентификации
-- Авторизация и гарда (гугли на тему аутентификации при работе с вебсокетами)
-*/
