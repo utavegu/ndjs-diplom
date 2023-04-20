@@ -1,39 +1,16 @@
-ПОХОЖЕ С ЭТОЙ ОШИБКОЙ НУЖНО РАЗОБРАТЬСЯ, ВОЗМОЖНО В НЕЙ КОРЕНЬ ПРОБЛЕМЫ (вылетает при логине и логауте)
-Возможно тут решение: https://stackoverflow.com/questions/64735881/typeerror-converting-circular-structure-to-json-starting-at-object-with-con
-После реализации аутентификации через куки и логина такая вот ошибка, при этом приложение не валится:
-[Nest] 289  - 04/06/2023, 11:19:46 AM   ERROR [ExceptionsHandler] Converting circular structure to JSON
-aggregator-app     |     --> starting at object with constructor 'Socket'
-aggregator-app     |     |     property '_writableState' -> object with constructor 'WritableState'
-aggregator-app     |     |     property 'afterWriteTickInfo' -> object with constructor 'Object'
-aggregator-app     |     --- property 'stream' closes the circle
-aggregator-app     | TypeError: Converting circular structure to JSON
-aggregator-app     |     --> starting at object with constructor 'Socket'
-aggregator-app     |     |     property '_writableState' -> object with constructor 'WritableState'
-aggregator-app     |     |     property 'afterWriteTickInfo' -> object with constructor 'Object'
-aggregator-app     |     --- property 'stream' closes the circle
-aggregator-app     |     at JSON.stringify (<anonymous>)
-aggregator-app     |     at stringify (/app/node_modules/express/lib/response.js:1150:12)
-aggregator-app     |     at ServerResponse.json (/app/node_modules/express/lib/response.js:271:14)
-aggregator-app     |     at ExpressAdapter.reply (/app/node_modules/@nestjs/platform-express/adapters/express-adapter.js:61:62)
-aggregator-app     |     at RouterResponseController.apply (/app/node_modules/@nestjs/core/router/router-response-controller.js:15:36)
-aggregator-app     |     at /app/node_modules/@nestjs/core/router/router-execution-context.js:176:48
-aggregator-app     |     at processTicksAndRejections (node:internal/process/task_queues:95:5)
-aggregator-app     |     at /app/node_modules/@nestjs/core/router/router-execution-context.js:47:13
-aggregator-app     |     at /app/node_modules/@nestjs/core/router/router-proxy.js:9:17
-
 pubic/client/index:
 1) Авторизация и токен
 2) Вебсокеты
 3) Формдата и файл
 
+С ролями чата нужно будет тоже пошаманить, но чат уже на самый десерт - после модуля броней. Сделать второй декоратор - ролес. И вот его прикручивать к нужным ручкам чата, где условие "манагер и текущий юзер". Даже если правильный доступ не заработает, сделай максимально всё так, будто он работает. С вытаскиванием юзера из контекста двумя способами - через реквест и вторым способом - context.switchToWs().getClient().handshake.user;
+
 - Аутентификация в сокетах (гарда не пускает, так как юзер не прикрепляется в реквест) - https://socket.io/how-to/use-with-express-session
 
 Поиск по TODO
-- Рефактор по тудусам
+- Рефактор по тудусам. В последнем коммите делаешь ветку прод, все тудусы сгребаешь сюда и удаляешь их в продакшн-ветке
 
 Вообще хэлперс можно переименовать в утилс и каждую вынести в отдельный файл
-
-С ролями чата нужно будет тоже пошаманить, но чат уже на самый десерт - после модуля броней. Сделать второй декоратор - ролес. И вот его прикручивать к нужным ручкам чата, где условие "манагер и текущий юзер". Даже если правильный доступ не заработает, сделай максимально всё так, будто он работает. С вытаскиванием юзера из контекста двумя способами - через реквест и вторым способом - context.switchToWs().getClient().handshake.user;
 
 Еще нужно получше разобраться с работой сессий в данном проекте. Пасспорт или экспресс. В мэйне и аус-модуле
 
