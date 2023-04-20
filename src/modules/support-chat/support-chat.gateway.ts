@@ -4,7 +4,8 @@ import {
   SubscribeMessage,
   WebSocketGateway,
   ConnectedSocket,
-  WebSocketServer
+  WebSocketServer,
+  WsResponse
 } from '@nestjs/websockets';
 import { Socket, Server } from 'socket.io';
 import { Message } from './schemas/message.schema';
@@ -25,9 +26,8 @@ export class SupportChatGateway {
 
   // Позволяет пользователю с ролью manager или client получать новые сообщения в чате через WebSocket
   // message: subscribeToChat payload: chatId
-  // @UseGuards(GatewayGuard)
+  // @UseGuards(WsAuthenticatedGuard)
   @SubscribeMessage('subscribeToChat')
-  // @OnEvent('newMessage')
   async subscribeHandler(
     @MessageBody('chatId') chatId: string,
     @ConnectedSocket() connectedSocket: Socket,
@@ -51,5 +51,16 @@ export class SupportChatGateway {
     (node:845) MaxListenersExceededWarning: (node) warning: possible EventEmitter memory leak detected. 11 listeners added. Use emitter.setMaxListeners() to increase limit.
     (Use `node --trace-warnings ...` to show where the warning was created)
     */
+  }
+
+  // Для тестов через public/client/index
+  @UseGuards(WsAuthenticatedGuard)
+  @SubscribeMessage('message-from-client')
+  async addComment(@MessageBody() body): Promise<WsResponse> {
+    console.log('ГАРДА ПРОПУСТИЛА!');
+    return {
+      event: 'ws-server-response',
+      data: 'Вы ввели: ' + body,
+    }
   }
 }

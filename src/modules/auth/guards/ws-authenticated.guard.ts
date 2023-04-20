@@ -1,28 +1,28 @@
-import { Injectable, CanActivate, ExecutionContext } from '@nestjs/common';
-import { WsException } from '@nestjs/websockets';
-import { Request } from 'express';
-import { User } from 'src/modules/users/schemas/user.schema';
-// import { IUser } from 'src/modules/users/types/i-user';
-// import { ERRORS_USER } from 'src/modules/users/users.constants';
+import { Injectable, ExecutionContext } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
 
 @Injectable()
 export class WsAuthenticatedGuard extends AuthGuard('jwt') {
   async canActivate(context: ExecutionContext) {
-    const socket = context.switchToWs().getClient();
-    const { request } = socket;
-    let isValidUser = false;
-    if (request.user) {
-      const { user } = request as Request & { user: User };
-      if (user.role === 'client' || user.role === 'manager') {
-        isValidUser = true;
-      }
-    }
+    const client = context.switchToWs().getClient();
+    const user1 = client.request.user;
+    const user2 = client.handshake.user;
 
-    if (isValidUser) {
-      return isValidUser && request.isAuthenticated();
-    }
+    console.log(user1); // Пусто
+    console.log(user2); // Пусто
+    // И судя по тому, что undefined, а не false - JwtAuthGuard не отрабатывает
 
-    throw new WsException('Пользователь не залогинен!');
+    /*
+    const getCookie = (name) => {
+      const matches = client.handshake.headers.cookie.match(new RegExp('(?:^|; )' + name.replace(/([\.$?*|{}\(\)\[\]\\\/\+^])/g, '\\$1') + '=([^;]*)'));
+      return matches ? decodeURIComponent(matches[1]) : undefined;
+    };
+
+    const token = getCookie('token'); // Можно вот отсюда его достать, вынуть данные из пэйлоада и работать с ними, но имхо, это порнография. И ещё есть момент, что логаут не затирает токен из client.handshake.headers.cookie. Ровно как и логин не всегда его туда добавляет... видимо тут важно наличие токена в куках на момент открытия соединения. Да, похоже на то. Логин/логаут + перезагрузка страницы = корректно достающийся тут токен. В общем нерабочий способ.
+    console.log(token);
+    */
+
+    return user1 || user2;
+    // TODO: роль - любой мэнэджер или пользователь, создавший обращение
   }
 }
