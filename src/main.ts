@@ -9,8 +9,13 @@ import { resolve } from 'path';
 import * as cookieParser from 'cookie-parser';
 import { SessionAdapter } from './modules/auth/session-adapter';
 import { JwtAuthGuard } from './modules/auth/guards/jwt.auth.guard';
+import { checkDirectoryExists } from 'src/helpers/check-directory-exists'
 
 async function bootstrap() {
+  ['public', 'public/client', 'public/img'].forEach(dirName => {
+    checkDirectoryExists(dirName);
+  });
+
   const app = await NestFactory.create<NestExpressApplication>(AppModule);
 
   // TODO: Почитай документацию на счет того, что это невзрослый подход, не продакшен - https://docs.nestjs.com/techniques/session
@@ -20,7 +25,7 @@ async function bootstrap() {
     secret: process.env.SESSION_SECRET,
     resave: true,
     saveUninitialized: true,
-});
+  });
 
   app
     .use(cookieParser())
