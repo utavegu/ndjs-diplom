@@ -132,7 +132,7 @@ export class HotelsController {
     const isEnabled = getBooleanValue(body.isEnabled);
     const images = getImagesPaths(files);
     return this.hotelsRoomsService.update(validateId(id), {
-      hotel: validateId(body.hotelId) as ObjectId, // Снова обманул... но лучше так не делать
+      hotel: validateId(body.hotelId) as ObjectId, // Снова обманул... но лучше так не делать. И должно ли оно быть обязательным при редактировании?
       description: body.description,
       isEnabled,
       images,

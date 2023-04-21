@@ -53,7 +53,7 @@ export class SupportChatController {
     return await this.supportRequestService.findSupportRequests({
       ...query,
       user: request?.user?.id,
-      isActive: true, // TODO: Не понимаю как это поле должно выставляться тут
+      isActive: true, // TODO: Не понимаю как это поле должно выставляться тут. Погоди, оно же квери-параметр должно быть. Ладно, уже пофиг.
       role: request?.user?.role,
     });
   }

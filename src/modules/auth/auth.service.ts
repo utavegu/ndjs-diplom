@@ -53,14 +53,4 @@ export class AuthService {
       throw new HttpException(err.message, err.status);
     }
   }
-
-  /*
-  async logout(request, session) {
-    // console.log(request.isAuthenticated());
-    // console.log(session);
-    // TODO: А что на счёт удаления куки?
-    // request.logout(); эээмм... ну тогда надо повникать будет
-    // Читай то, что у тебя в закладках JWT и 3 статьи документации неста. Сейчас самое время в эту тему поврубаться и сделать всё максимально красиво (увы, пока без клиента). Видео Улбика по продвинутой JWT-авторизации
-  }
-  */
 }
